@@ -17,7 +17,7 @@ export class UsersService {
   }
 
   async findOne(id: number): Promise<User> {
-    return this.userModel.findOne({ where: { id } });
+    return await this.userModel.findOne({ where: { id } });
   }
 
   async findOneByEmail(email: string): Promise<User> {
@@ -84,5 +84,23 @@ export class UsersService {
     } catch (error) {
       throw error;
     }
+  }
+
+  async update(id: number, userDto: UserDto): Promise<User> {
+    const user = await this.findOne(id);
+    if (!user) {
+      throw new HttpException('user not found', HttpStatus.NOT_FOUND);
+    }
+    await user.update(userDto);
+    return user;
+  }
+
+  async delete(id: number): Promise<void> {
+    const user = await this.findOne(id);
+    if (!user) {
+      throw new HttpException('user not found', HttpStatus.NOT_FOUND);
+    }
+    await user.destroy();
+    return null;
   }
 }
