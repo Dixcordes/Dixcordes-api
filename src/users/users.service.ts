@@ -29,6 +29,15 @@ export class UsersService {
           'firstName and lastName are required',
           HttpStatus.BAD_REQUEST,
         );
+      } else if (userDto.email === undefined || userDto.email === '') {
+        throw new HttpException('email is required', HttpStatus.BAD_REQUEST);
+      } else if (userDto.email.includes('@') === false) {
+        throw new HttpException(
+          'email must be a valid email address',
+          HttpStatus.BAD_REQUEST,
+        );
+      } else if (this.findOneByEmail(userDto.email)) {
+        throw new HttpException('email already exists', HttpStatus.BAD_REQUEST);
       }
       return await this.userModel.create({
         firstName: userDto.firstName,
@@ -36,10 +45,7 @@ export class UsersService {
         email: userDto.email,
       });
     } catch (error) {
-      throw new HttpException(
-        'firstName and lastName are required',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw error;
     }
   }
 }
