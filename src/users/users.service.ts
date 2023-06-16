@@ -40,7 +40,7 @@ export class UsersService {
         );
       } else if (userDto.password === undefined || userDto.password === '') {
         throw new HttpException('password is required', HttpStatus.BAD_REQUEST);
-      } else {
+      } else if (userDto.email) {
         const existingUser = await this.findOneByEmail(userDto.email);
         if (existingUser) {
           throw new HttpException(
@@ -48,6 +48,30 @@ export class UsersService {
             HttpStatus.BAD_REQUEST,
           );
         }
+      }
+      switch (userDto.password) {
+        case '123456':
+          throw new HttpException(
+            'password is too common',
+            HttpStatus.BAD_REQUEST,
+          );
+        case 'password':
+          throw new HttpException(
+            'password is too common',
+            HttpStatus.BAD_REQUEST,
+          );
+        case 'password123':
+          throw new HttpException(
+            'password is too common',
+            HttpStatus.BAD_REQUEST,
+          );
+        case 'passw0rd':
+          throw new HttpException(
+            'password is too common',
+            HttpStatus.BAD_REQUEST,
+          );
+        default:
+          break;
       }
       const saltOrRounds = 10;
       const hashedPassword = await bcrypt.hash(userDto.password, saltOrRounds);
