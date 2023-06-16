@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './user.model';
 import { UserDto } from './user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -37,6 +38,8 @@ export class UsersService {
           'email must be a valid email address',
           HttpStatus.BAD_REQUEST,
         );
+      } else if (userDto.password === undefined || userDto.password === '') {
+        throw new HttpException('password is required', HttpStatus.BAD_REQUEST);
       } else {
         const existingUser = await this.findOneByEmail(userDto.email);
         if (existingUser) {
@@ -46,10 +49,13 @@ export class UsersService {
           );
         }
       }
+      const saltOrRounds = 10;
+      const hashedPassword = await bcrypt.hash(userDto.password, saltOrRounds);
       return await this.userModel.create({
         firstName: userDto.firstName,
         lastName: userDto.lastName,
         email: userDto.email,
+        password: hashedPassword,
       });
     } catch (error) {
       throw error;
