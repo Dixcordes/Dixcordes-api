@@ -5,6 +5,7 @@ import { UserDto } from './user.dto';
 
 @Injectable()
 export class UsersService {
+  usersService: any;
   constructor(
     @InjectModel(User)
     private userModel: typeof User,
@@ -36,8 +37,14 @@ export class UsersService {
           'email must be a valid email address',
           HttpStatus.BAD_REQUEST,
         );
-      } else if (this.findOneByEmail(userDto.email)) {
-        throw new HttpException('email already exists', HttpStatus.BAD_REQUEST);
+      } else {
+        const existingUser = await this.findOneByEmail(userDto.email);
+        if (existingUser) {
+          throw new HttpException(
+            'email already exists',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
       }
       return await this.userModel.create({
         firstName: userDto.firstName,
