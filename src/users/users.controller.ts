@@ -17,4 +17,14 @@ export class UsersController {
   findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
+
+  @Get()
+  findOne(id: number): Promise<User> {
+    return this.usersService.findOne(id);
+  }
+
+  @Get()
+  findOneByEmail(email: string): Promise<User> {
+    return this.usersService.findOneByEmail(email);
+  }
 }

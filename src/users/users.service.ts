@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './user.model';
 import { UserDto } from './user.dto';
@@ -10,18 +10,36 @@ export class UsersService {
     private userModel: typeof User,
   ) {}
 
-  create(userDto: UserDto): Promise<User> {
-    if (userDto.firstName === undefined || userDto.lastName === undefined) {
-      return Promise.reject(new Error('firstName and lastName are required'));
-    }
-    return this.userModel.create({
-      firstName: userDto.firstName,
-      lastName: userDto.lastName,
-      email: userDto.email,
-    });
-  }
-
   async findAll(): Promise<User[]> {
     return this.userModel.findAll();
+  }
+
+  async findOne(id: number): Promise<User> {
+    return this.userModel.findOne({ where: { id } });
+  }
+
+  async findOneByEmail(email: string): Promise<User> {
+    return this.userModel.findOne({ where: { email } });
+  }
+
+  async create(userDto: UserDto): Promise<User> {
+    try {
+      if (userDto.firstName === undefined || userDto.lastName === undefined) {
+        throw new HttpException(
+          'firstName and lastName are required',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      return await this.userModel.create({
+        firstName: userDto.firstName,
+        lastName: userDto.lastName,
+        email: userDto.email,
+      });
+    } catch (error) {
+      throw new HttpException(
+        'firstName and lastName are required',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }
