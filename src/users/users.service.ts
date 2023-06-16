@@ -86,6 +86,38 @@ export class UsersService {
     }
   }
 
+  async login(userDto: UserDto): Promise<User> {
+    try {
+      if (userDto.email === undefined || userDto.email === '') {
+        throw new HttpException('email is required', HttpStatus.BAD_REQUEST);
+      } else if (userDto.password === undefined || userDto.password === '') {
+        throw new HttpException('password is required', HttpStatus.BAD_REQUEST);
+      } else if (userDto.email) {
+        const existingUser = await this.findOneByEmail(userDto.email);
+        if (!existingUser) {
+          throw new HttpException(
+            'email does not exist',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+        const isMatch = await bcrypt.compare(
+          userDto.password,
+          existingUser.password,
+        );
+        if (!isMatch) {
+          throw new HttpException(
+            'password is incorrect',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+        console.log('existingUser', existingUser.firstName);
+        return existingUser;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async update(id: number, userDto: UserDto): Promise<User> {
     const user = await this.findOne(id);
     if (!user) {
