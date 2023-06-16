@@ -17,13 +17,13 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @Get()
-  findOne(id: number): Promise<User> {
+  @Get(':id')
+  findOne(@Param('id') id: number): Promise<User> {
     return this.usersService.findOne(id);
   }
 
-  @Get()
-  findOneByEmail(email: string): Promise<User> {
+  @Get(':email')
+  findOneByEmail(@Param('email') email: string): Promise<User> {
     return this.usersService.findOneByEmail(email);
   }
 }
