@@ -3,12 +3,9 @@ import { Photo } from '../photos/photo.model';
 
 @Table({ tableName: 'users' })
 export class User extends Model {
-  static findOneByEmail(email: string) {
-    throw new Error('Method not implemented.');
-  }
-  static findById(id: number): User | PromiseLike<User> {
-    throw new Error('Method not implemented.');
-  }
+  @Column({ primaryKey: true, autoIncrement: true })
+  id: number;
+
   @Column
   firstName: string;
 
@@ -20,6 +17,9 @@ export class User extends Model {
 
   @Column
   password: string;
+
+  @Column({ defaultValue: false })
+  isAdmin: boolean;
 
   @Column({ defaultValue: true })
   isActive: boolean;
