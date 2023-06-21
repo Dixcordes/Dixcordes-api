@@ -4,8 +4,7 @@ import { AppService } from '../services/app.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from 'src/users/user.model';
 import { UsersModule } from 'src/users/users.module';
-// import { UsersController } from 'src/controllers/users/users.controller';
-// import { UsersService } from 'src/services/users/users.service';
+import { GatewayModule } from 'src/websocket/gateway.module';
 
 @Module({
   imports: [
@@ -21,6 +20,7 @@ import { UsersModule } from 'src/users/users.module';
       synchronize: true,
     }),
     UsersModule,
+    GatewayModule,
   ],
   controllers: [AppController],
   providers: [AppService],
