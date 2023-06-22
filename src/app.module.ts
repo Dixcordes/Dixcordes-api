@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { AppController } from 'src/controllers/app.controller';
-import { AppService } from '../services/app.service';
+import { AppController } from 'src/app/app.controller';
+import { AppService } from './app/app.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from 'src/users/user.model';
 import { UsersModule } from 'src/users/users.module';
