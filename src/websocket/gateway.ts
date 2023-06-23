@@ -32,8 +32,13 @@ export class MyGateway implements OnModuleInit {
   }
 
   @SubscribeMessage('joinRoom')
-  joinRoom(data) {
+  joinRoom(@MessageBody() data: { roomName: string; userId: string }) {
     this.roomService.joinRoom(data.roomName, data.userId);
+  }
+
+  @SubscribeMessage('leaveRoom')
+  leaveRoom(@MessageBody() data: { roomName: string; userId: string }) {
+    this.roomService.leaveRoom(data.roomName, data.userId);
   }
 
   @SubscribeMessage('message')
