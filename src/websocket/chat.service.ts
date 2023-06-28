@@ -1,19 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { RoomService } from './room.service';
 import { Server } from 'socket.io';
-import { WebSocketServer } from '@nestjs/websockets';
+import {
+  WebSocketServer,
+  MessageBody,
+  SubscribeMessage,
+  WebSocketGateway,
+} from '@nestjs/websockets';
 
 @Injectable()
 export class ChatService {
-  constructor(private roomService: RoomService) {}
   @WebSocketServer() private server: Server;
+  constructor(private roomService: RoomService) {}
 
-  sendMessage(roomId: string, userId: string, message: string) {
-    const roomMembers = this.roomService.getRoomMembers(roomId);
-    if (roomMembers.includes(userId)) {
-      this.server.emit('message', { userId, message });
-    } else {
-      // Gérer l'erreur - l'utilisateur n'appartient pas à la room
-    }
-  }
+  // sendMessage(roomName: string, userId: string, message: string) {
+  //   const roomMembers = this.roomService.getRoomMembers(roomName);
+  //   console.log(roomMembers);
+  //   if (roomMembers.includes(userId)) {
+  //     //console.log('message', { userId, message });
+  //     this.server.emit('message', { userId, message });
+  //   } else {
+  //     console.log('User not in room');
+  //   }
+  // }
 }

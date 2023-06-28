@@ -25,7 +25,7 @@ export class RoomService {
       room.members.add(userId);
       console.log(room);
     }
-    //console.log('Room pipicaca');
+    console.log('Room pipicaca');
   }
 
   leaveRoom(roomName: string, userId: string) {
@@ -41,6 +41,7 @@ export class RoomService {
 
   getRoomMembers(roomName: string): string[] {
     const room = this.rooms.get(roomName);
+    //console.log([...room.members]);
     return room ? [...room.members] : [];
   }
 }
