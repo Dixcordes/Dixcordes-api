@@ -1,5 +1,4 @@
-import { Column, Model, Table, HasOne } from 'sequelize-typescript';
-import { Photo } from '../photos/photo.model';
+import { Column, Model, Table } from 'sequelize-typescript';
 
 @Table({ tableName: 'users' })
 export class User extends Model {
