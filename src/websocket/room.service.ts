@@ -25,7 +25,6 @@ export class RoomService {
       room.members.add(userId);
       console.log(room);
     }
-    console.log('Room pipicaca');
   }
 
   leaveRoom(roomName: string, userId: string) {
