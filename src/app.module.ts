@@ -6,6 +6,7 @@ import { User } from 'src/users/user.model';
 import { UsersModule } from 'src/users/users.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { GatewayModule } from 'src/websocket/gateway.module';
+import { ServersModule } from './servers/servers.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { GatewayModule } from 'src/websocket/gateway.module';
     UsersModule,
     AuthModule,
     GatewayModule,
+    ServersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
