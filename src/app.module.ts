@@ -7,6 +7,7 @@ import { UsersModule } from 'src/users/users.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { GatewayModule } from 'src/websocket/gateway.module';
 import { ServersModule } from './servers/servers.module';
+import { AuthGuard } from './auth/auth.guard';
 
 @Module({
   imports: [
@@ -27,6 +28,12 @@ import { ServersModule } from './servers/servers.module';
     ServersModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: 'APP_GUARD',
+      useClass: AuthGuard,
+    },
+  ],
 })
 export class AppModule {}

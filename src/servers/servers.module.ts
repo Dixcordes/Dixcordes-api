@@ -11,3 +11,8 @@ import { ServersService } from './servers.service';
   exports: [SequelizeModule],
 })
 export class ServersModule {}
+
+/*
+IF I CAN'T CREATE SERVER WITH THE 
+AUTHOR OF THE REQUEST OR SOMETHONG ELSE, LOOK AT THE EXPORTS
+*/
