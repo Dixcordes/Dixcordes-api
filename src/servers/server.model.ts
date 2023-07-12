@@ -22,7 +22,7 @@ export class Server extends Model {
   @Column({ defaultValue: true })
   isActive: boolean;
 
-  @Column({ defaultValue: 0 })
+  @Column({ defaultValue: 1 })
   totalMembers: number;
 
   @BelongsToMany(() => User, () => ServerUser)

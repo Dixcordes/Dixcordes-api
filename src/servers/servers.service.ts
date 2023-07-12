@@ -46,4 +46,21 @@ export class ServersService {
       throw error;
     }
   }
+
+  async joinServer(serverId: number, userId: number): Promise<Server> {
+    try {
+      const server = await this.serverModel.findOne({
+        where: { id: serverId },
+      });
+      const user = await this.userModel.findOne({
+        where: { id: userId },
+      });
+      await server.$add('members', user, {
+        through: { active: true },
+      });
+      return server;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
