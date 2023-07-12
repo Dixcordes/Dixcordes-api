@@ -4,6 +4,7 @@ export class ServerDto {
   photo: string;
   isPublic: boolean;
   isActive: boolean;
+  admin: string;
   totalMembers: Set<number>;
   members: Set<string>;
 }

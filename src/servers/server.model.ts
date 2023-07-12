@@ -11,6 +11,9 @@ export class Server extends Model {
   @Column
   photo: string;
 
+  @Column
+  admin: string;
+
   @Column({ defaultValue: false })
   isPublic: boolean;
 
@@ -22,4 +25,5 @@ export class Server extends Model {
 
   @Column({ defaultValue: '' })
   members: string;
+
 }

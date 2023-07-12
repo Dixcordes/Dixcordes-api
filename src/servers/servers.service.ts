@@ -10,16 +10,18 @@ export class ServersService {
     private serverModel: typeof Server,
   ) {}
 
-  async createServer(serverDto: ServerDto): Promise<Server> {
+  async createServer(serverDto: ServerDto, req: string): Promise<Server> {
     try {
       if (serverDto.name === undefined || serverDto.name === '') {
         throw new HttpException('name is required', HttpStatus.BAD_REQUEST);
       } else if (serverDto.photo === undefined || serverDto.photo === '') {
         serverDto.photo = '';
       }
+      const serverCreator = req;
       return await this.serverModel.create({
         name: serverDto.name,
         photo: serverDto.photo,
+        admin: serverCreator,
         isPublic: serverDto.isPublic,
         isActive: serverDto.isActive,
         totalMembers: serverDto.totalMembers,
