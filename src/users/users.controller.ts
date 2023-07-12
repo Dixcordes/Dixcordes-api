@@ -14,11 +14,6 @@ export class UsersController {
     return this.usersService.create(userDto);
   }
 
-  // @Post('login')
-  // login(@Body() userDto: UserDto): Promise<User> {
-  //   return this.usersService.login(userDto);
-  // }
-
   @Get()
   findAll(): Promise<User[]> {
     return this.usersService.findAll();
