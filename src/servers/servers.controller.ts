@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Request,
-} from '@nestjs/common';
+import { Body, Controller, Post, Request } from '@nestjs/common';
 import { ServerDto } from './dto/server.dto';
 import { ServersService } from './servers.service';
 import { Server } from './server.model';
