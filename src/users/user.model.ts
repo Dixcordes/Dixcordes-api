@@ -1,4 +1,15 @@
-import { Column, Model, Table } from 'sequelize-typescript';
+import {
+  Column,
+  Model,
+  Table,
+  HasMany,
+  ForeignKey,
+  BelongsTo,
+  BelongsToMany,
+} from 'sequelize-typescript';
+import { Server } from '../servers/server.model';
+import { DataTypes } from 'sequelize';
+import { ServerUser } from 'src/server-user/server-user.model';
 
 @Table({ tableName: 'users' })
 export class User extends Model {
@@ -23,6 +34,6 @@ export class User extends Model {
   @Column({ defaultValue: true })
   isActive: boolean;
 
-  // @HasOne(() => Photo)
-  // photo: Photo;
+  @BelongsToMany(() => User, () => ServerUser)
+  users: User[];
 }

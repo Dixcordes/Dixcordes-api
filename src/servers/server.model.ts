@@ -1,4 +1,5 @@
-import { Column, Model, Table } from 'sequelize-typescript';
+import { Column, Model, Table, BelongsToMany } from 'sequelize-typescript';
+import { ServerUser } from 'src/server-user/server-user.model';
 
 @Table({ tableName: 'servers' })
 export class Server extends Model {
@@ -23,7 +24,6 @@ export class Server extends Model {
   @Column({ defaultValue: 0 })
   totalMembers: number;
 
-  @Column({ defaultValue: '' })
-  members: string;
-
+  @BelongsToMany(() => Server, () => ServerUser)
+  servers: Server[];
 }

@@ -8,6 +8,8 @@ import { AuthModule } from 'src/auth/auth.module';
 import { GatewayModule } from 'src/websocket/gateway.module';
 import { ServersModule } from './servers/servers.module';
 import { AuthGuard } from './auth/auth.guard';
+import { ServerUser } from './server-user/server-user.model';
+import { Server } from './servers/server.model';
 
 @Module({
   imports: [
@@ -18,7 +20,7 @@ import { AuthGuard } from './auth/auth.guard';
       username: 'postgres',
       password: 'postgres',
       database: 'cordes',
-      models: [User],
+      models: [User, Server, ServerUser],
       autoLoadModels: true,
       synchronize: true,
     }),

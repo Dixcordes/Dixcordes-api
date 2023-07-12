@@ -22,10 +22,10 @@ export class ServersService {
         name: serverDto.name,
         photo: serverDto.photo,
         admin: serverCreator,
+        members: [serverCreator, serverDto.members],
         isPublic: serverDto.isPublic,
         isActive: serverDto.isActive,
         totalMembers: serverDto.totalMembers,
-        members: serverDto.members,
       });
     } catch (error) {
       throw error;
