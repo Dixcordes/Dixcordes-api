@@ -1,5 +1,6 @@
 import { Column, Model, Table, BelongsToMany } from 'sequelize-typescript';
 import { ServerUser } from 'src/server-user/server-user.model';
+import { User } from 'src/users/user.model';
 
 @Table({ tableName: 'servers' })
 export class Server extends Model {
@@ -24,6 +25,6 @@ export class Server extends Model {
   @Column({ defaultValue: 0 })
   totalMembers: number;
 
-  @BelongsToMany(() => Server, () => ServerUser)
-  servers: Server[];
+  @BelongsToMany(() => User, () => ServerUser)
+  members: User[];
 }

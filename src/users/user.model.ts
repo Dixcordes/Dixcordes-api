@@ -1,14 +1,5 @@
-import {
-  Column,
-  Model,
-  Table,
-  HasMany,
-  ForeignKey,
-  BelongsTo,
-  BelongsToMany,
-} from 'sequelize-typescript';
+import { Column, Model, Table, BelongsToMany } from 'sequelize-typescript';
 import { Server } from '../servers/server.model';
-import { DataTypes } from 'sequelize';
 import { ServerUser } from 'src/server-user/server-user.model';
 
 @Table({ tableName: 'users' })
@@ -34,6 +25,6 @@ export class User extends Model {
   @Column({ defaultValue: true })
   isActive: boolean;
 
-  @BelongsToMany(() => User, () => ServerUser)
-  users: User[];
+  @BelongsToMany(() => Server, () => ServerUser)
+  servers: Server[];
 }

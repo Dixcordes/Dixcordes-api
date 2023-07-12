@@ -3,9 +3,11 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { Server } from './server.model';
 import { ServersController } from './servers.controller';
 import { ServersService } from './servers.service';
+import { ServerUser } from '../server-user/server-user.model';
+import { User } from 'src/users/user.model';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Server])],
+  imports: [SequelizeModule.forFeature([Server, ServerUser, User])],
   providers: [ServersService],
   controllers: [ServersController],
   exports: [SequelizeModule],
