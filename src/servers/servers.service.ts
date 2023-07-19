@@ -2,7 +2,6 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Server } from './server.model';
 import { ServerDto } from './dto/server.dto';
-import { ServerUser } from '../server-user/server-user.model';
 import { User } from 'src/users/user.model';
 
 @Injectable()
@@ -12,8 +11,6 @@ export class ServersService {
     private serverModel: typeof Server,
     @InjectModel(User)
     private userModel: typeof User,
-    @InjectModel(ServerUser)
-    private serverUserModel: typeof ServerUser,
   ) {}
 
   async createServer(serverDto: ServerDto, req: string): Promise<Server> {
@@ -47,15 +44,33 @@ export class ServersService {
     }
   }
 
-  async joinServer(serverId: number, userId: number): Promise<Server> {
+  async joinServer(serverId: number, req: string): Promise<Server> {
     try {
       const server = await this.serverModel.findOne({
         where: { id: serverId },
       });
       const user = await this.userModel.findOne({
-        where: { id: userId },
+        where: { id: req },
       });
-      await server.$add('members', user, {
+      if (!server) {
+        throw new HttpException('server not found', HttpStatus.NOT_FOUND);
+      } else if (!user) {
+        throw new HttpException('user not found', HttpStatus.NOT_FOUND);
+      }
+
+      const updatedServer = await this.serverModel.update(
+        {
+          totalMembers: server.totalMembers + 1,
+        },
+        {
+          where: { id: serverId },
+          returning: true, // This ensures that the updated server is returned
+        },
+      );
+
+      const updatedServerData = updatedServer[1][0];
+
+      await updatedServerData.$add('members', user, {
         through: { active: true },
       });
       return server;

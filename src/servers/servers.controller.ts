@@ -12,7 +12,7 @@ export class ServersController {
     return this.serversService.createServer(serverDto, req.user.sub);
   }
 
-  @Post('join')
+  @Post('join/:serverId')
   joinServer(@Param('serverId') serverId, @Request() req): Promise<Server> {
     return this.serversService.joinServer(serverId, req.user.sub);
   }
