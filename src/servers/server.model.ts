@@ -1,30 +1,30 @@
 import { Column, Model, Table, BelongsToMany } from 'sequelize-typescript';
-import { Server } from '../servers/server.model';
 import { ServerUser } from 'src/server-user/server-user.model';
+import { User } from 'src/users/user.model';
 
-@Table({ tableName: 'users' })
-export class User extends Model {
+@Table({ tableName: 'servers' })
+export class Server extends Model {
   @Column({ primaryKey: true, autoIncrement: true })
   id: number;
 
   @Column
-  firstName: string;
+  name: string;
 
   @Column
-  lastName: string;
+  photo: string;
 
   @Column
-  email: string;
-
-  @Column
-  password: string;
+  admin: string;
 
   @Column({ defaultValue: false })
-  isAdmin: boolean;
+  isPublic: boolean;
 
   @Column({ defaultValue: true })
   isActive: boolean;
 
-  @BelongsToMany(() => Server, () => ServerUser)
-  servers: Server[];
+  @Column({ defaultValue: 1 })
+  totalMembers: number;
+
+  @BelongsToMany(() => User, () => ServerUser)
+  members: User[];
 }
