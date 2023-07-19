@@ -16,4 +16,9 @@ export class ServersController {
   joinServer(@Param('serverId') serverId, @Request() req): Promise<Server> {
     return this.serversService.joinServer(serverId, req.user.sub);
   }
+
+  @Post('leave/:serverId')
+  leaveServer(@Param('serverId') serverId, @Request() req): Promise<Server> {
+    return this.serversService.leaveServer(serverId, req.user.sub);
+  }
 }
