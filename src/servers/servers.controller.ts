@@ -22,3 +22,4 @@ export class ServersController {
     return this.serversService.leaveServer(serverId, req.user.sub);
   }
 }
+
