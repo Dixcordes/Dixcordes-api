@@ -1,7 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './user.model';
-import { UserDto } from './user.dto';
+import { UserDto } from './dto/user.dto';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -10,6 +11,7 @@ export class UsersService {
   constructor(
     @InjectModel(User)
     private userModel: typeof User,
+    private jwtService: JwtService,
   ) {}
 
   async findAll(): Promise<User[]> {
@@ -86,42 +88,19 @@ export class UsersService {
     }
   }
 
-  async login(userDto: UserDto): Promise<User> {
-    try {
-      if (userDto.email === undefined || userDto.email === '') {
-        throw new HttpException('email is required', HttpStatus.BAD_REQUEST);
-      } else if (userDto.password === undefined || userDto.password === '') {
-        throw new HttpException('password is required', HttpStatus.BAD_REQUEST);
-      } else if (userDto.email) {
-        const existingUser = await this.findOneByEmail(userDto.email);
-        if (!existingUser) {
-          throw new HttpException(
-            'email does not exist',
-            HttpStatus.BAD_REQUEST,
-          );
-        }
-        const isMatch = await bcrypt.compare(
-          userDto.password,
-          existingUser.password,
-        );
-        if (!isMatch) {
-          throw new HttpException(
-            'password is incorrect',
-            HttpStatus.BAD_REQUEST,
-          );
-        }
-        console.log('existingUser', existingUser.firstName);
-        return existingUser;
-      }
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async update(id: number, userDto: UserDto): Promise<User> {
+  async update(
+    id: number,
+    userDto: UserDto,
+    tokenUserId: number,
+  ): Promise<User> {
     const user = await this.findOne(id);
     if (!user) {
       throw new HttpException('user not found', HttpStatus.NOT_FOUND);
+    } else if (user.id !== tokenUserId) {
+      throw new HttpException(
+        'you can only update your own user',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
     await user.update(userDto);
     return user;
