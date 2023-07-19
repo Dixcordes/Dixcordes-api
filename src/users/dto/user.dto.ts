@@ -6,4 +6,3 @@ export class UserDto {
   password: string;
   isAdmin: boolean;
 }
-
