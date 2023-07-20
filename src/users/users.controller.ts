@@ -12,8 +12,9 @@ import {
 import { UserDto } from 'src/users/dto/user.dto';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/user.model';
-import { Public } from 'src/shared/public.decorator';
+import { Public } from 'src/core/decorator/public.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { FileExtensionValidationPipe } from 'src/core/pipes/files-extension.pipe';
 
 @Controller('users')
 export class UsersController {
@@ -41,13 +42,13 @@ export class UsersController {
   }
 
   @Patch(':id')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file'), FileExtensionValidationPipe)
   update(
     @UploadedFile() file: Express.Multer.File,
     @Param('id') id: number,
     @Body() userDto: UserDto,
     @Request() req,
   ): Promise<User> {
-    return this.usersService.update(id, userDto, req);
+    return this.usersService.update(id, userDto, file, req);
   }
 }

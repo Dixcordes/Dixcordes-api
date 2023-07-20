@@ -94,9 +94,11 @@ export class UsersService {
   async update(
     id: number,
     userDto: UserDto,
+    file: Express.Multer.File,
     tokenUserId: number,
   ): Promise<User> {
     const user = await this.findOne(id);
+    let newPhoto;
     if (!user) {
       throw new HttpException('user not found', HttpStatus.NOT_FOUND);
     } else if (user.id !== tokenUserId) {
@@ -104,8 +106,13 @@ export class UsersService {
         'you can only update your own user',
         HttpStatus.UNAUTHORIZED,
       );
-    } else if ()
-    await user.update(userDto);
+    } else if (file != undefined || '') {
+      newPhoto = file;
+    }
+    await user.update({
+      userDto,
+      photo: newPhoto,
+    });
     return user;
   }
 
