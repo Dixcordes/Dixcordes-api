@@ -1,8 +1,19 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Request,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { UserDto } from 'src/users/dto/user.dto';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/user.model';
 import { Public } from 'src/shared/public.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('users')
 export class UsersController {
@@ -27,5 +38,16 @@ export class UsersController {
   @Get(':email')
   findOneByEmail(@Param('email') email: string): Promise<User> {
     return this.usersService.findOneByEmail(email);
+  }
+
+  @Patch(':id')
+  @UseInterceptors(FileInterceptor('file'))
+  update(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('id') id: number,
+    @Body() userDto: UserDto,
+    @Request() req,
+  ): Promise<User> {
+    return this.usersService.update(id, userDto, req);
   }
 }

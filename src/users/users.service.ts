@@ -28,6 +28,7 @@ export class UsersService {
   }
 
   async create(userDto: UserDto): Promise<User> {
+    const defaultPhoto = '/files/users/default/default_photo.png';
     try {
       if (userDto.firstName === undefined || userDto.lastName === undefined) {
         throw new HttpException(
@@ -51,8 +52,6 @@ export class UsersService {
             HttpStatus.BAD_REQUEST,
           );
         }
-      } else if (userDto.photo === undefined || userDto.photo === '') {
-        userDto.photo = '/files/users/default_photo.png';
       }
       switch (userDto.password) {
         case '123456':
@@ -84,6 +83,7 @@ export class UsersService {
         firstName: userDto.firstName,
         lastName: userDto.lastName,
         email: userDto.email,
+        photo: defaultPhoto,
         password: hashedPassword,
       });
     } catch (error) {
@@ -104,7 +104,7 @@ export class UsersService {
         'you can only update your own user',
         HttpStatus.UNAUTHORIZED,
       );
-    }
+    } else if ()
     await user.update(userDto);
     return user;
   }
