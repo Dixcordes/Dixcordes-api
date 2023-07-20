@@ -98,7 +98,6 @@ export class UsersService {
     tokenUserId: number,
   ): Promise<User> {
     const user = await this.findOne(id);
-    let newPhoto;
     if (!user) {
       throw new HttpException('user not found', HttpStatus.NOT_FOUND);
     } else if (user.id !== tokenUserId) {
@@ -107,12 +106,12 @@ export class UsersService {
         HttpStatus.UNAUTHORIZED,
       );
     } else if (file != undefined || '' || null) {
-      newPhoto = file.originalname;
+      const newPhoto = file.filename;
+      userDto.photo = newPhoto;
     }
     await user.update({
       firstName: userDto.firstName,
       lastName: userDto.lastName,
-      photo: `${process.env.DEV_URL}${process.env.API_VERSION}${process.env.UPLOAD_LOCATION}${newPhoto}`,
     });
     return user;
   }
@@ -126,14 +125,33 @@ export class UsersService {
     return null;
   }
 
-  async UploadPhoto(file: Express.Multer.File): Promise<string> {
+  async UploadPhoto(
+    file: Express.Multer.File,
+    oldFile: Express.Multer.File,
+  ): Promise<string> {
     const { originalname } = file;
-    // use the method of files services to generate a unique filename
-    const uniqueFileName = FilesServices.generateUniqueFileName(originalname);
-    const destinationPath = join('files/users', uniqueFileName);
-    // rename the file path to the destination path
-    await fsPromises.rename(file.path, destinationPath);
-    const imageUrl = `${process.env.DEV_URL} + ${process.env.API_VERSION} + ${uniqueFileName}`;
-    return imageUrl;
+    const { path } = oldFile;
+
+    if (!path) {
+      throw new Error("Le chemin d'accès du fichier source est manquant");
+    }
+
+    try {
+      const uniqueFileName = FilesServices.generateUniqueFileName(originalname);
+      const destinationPath = join('files/users', uniqueFileName);
+
+      await fsPromises.rename(path, destinationPath);
+
+      const imageUrl = `${process.env.DEV_URL}${process.env.API_VERSION}${process.env.USER_UPLOAD_LOCATION}${uniqueFileName}`;
+
+      // Supprimez le fichier source après le renommage
+      await fsPromises.unlink(path);
+
+      return imageUrl;
+    } catch (error) {
+      // Supprimez le fichier source en cas d'erreur
+      await fsPromises.unlink(path);
+      throw error;
+    }
   }
 }
