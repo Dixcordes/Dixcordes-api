@@ -2,8 +2,10 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './user.model';
 import { UserDto } from './dto/user.dto';
-import { JwtService } from '@nestjs/jwt';
+import { FilesServices } from 'src/utils/files/files-utils.service';
 import * as bcrypt from 'bcrypt';
+import { join } from 'path';
+import { promises as fsPromises } from 'fs';
 
 @Injectable()
 export class UsersService {
@@ -11,7 +13,6 @@ export class UsersService {
   constructor(
     @InjectModel(User)
     private userModel: typeof User,
-    private jwtService: JwtService,
   ) {}
 
   async findAll(): Promise<User[]> {
@@ -50,6 +51,8 @@ export class UsersService {
             HttpStatus.BAD_REQUEST,
           );
         }
+      } else if (userDto.photo === undefined || userDto.photo === '') {
+        userDto.photo = '/files/users/default_photo.png';
       }
       switch (userDto.password) {
         case '123456':
@@ -113,5 +116,16 @@ export class UsersService {
     }
     await user.destroy();
     return null;
+  }
+
+  async UploadPhoto(file: Express.Multer.File): Promise<string> {
+    const { originalname } = file;
+    // use the method of files services to generate a unique filename
+    const uniqueFileName = FilesServices.generateUniqueFileName(originalname);
+    const destinationPath = join('files/users', uniqueFileName);
+    // rename the file path to the destination path
+    await fsPromises.rename(file.path, destinationPath);
+    const imageUrl = `${process.env.DEV_URL} + ${process.env.API_VERSION} + ${uniqueFileName}`;
+    return imageUrl;
   }
 }

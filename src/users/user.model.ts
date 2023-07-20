@@ -14,6 +14,9 @@ export class User extends Model {
   lastName: string;
 
   @Column
+  photo: string;
+
+  @Column
   email: string;
 
   @Column
