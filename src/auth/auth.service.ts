@@ -41,7 +41,6 @@ export class AuthService {
             HttpStatus.BAD_REQUEST,
           );
         }
-        console.log('existingUser', existingUser.firstName);
         const payload = {
           sub: existingUser.id,
           firstName: existingUser.firstName,
