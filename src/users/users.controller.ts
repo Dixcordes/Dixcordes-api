@@ -49,6 +49,6 @@ export class UsersController {
     @Body() userDto: UserDto,
     @Request() req,
   ): Promise<User> {
-    return this.usersService.update(id, userDto, file, req);
+    return this.usersService.update(id, userDto, file, req.user.sub);
   }
 }

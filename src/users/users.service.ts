@@ -106,12 +106,13 @@ export class UsersService {
         'you can only update your own user',
         HttpStatus.UNAUTHORIZED,
       );
-    } else if (file != undefined || '') {
-      newPhoto = file;
+    } else if (file != undefined || '' || null) {
+      newPhoto = file.originalname;
     }
     await user.update({
-      userDto,
-      photo: newPhoto,
+      firstName: userDto.firstName,
+      lastName: userDto.lastName,
+      photo: `${process.env.DEV_URL}${process.env.API_VERSION}${process.env.UPLOAD_LOCATION}${newPhoto}`,
     });
     return user;
   }
