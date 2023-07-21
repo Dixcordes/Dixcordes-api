@@ -1,4 +1,4 @@
-import { OnModuleInit } from '@nestjs/common';
+import { OnModuleInit, UseGuards } from '@nestjs/common';
 import {
   MessageBody,
   SubscribeMessage,
@@ -8,12 +8,9 @@ import {
 import { Server } from 'socket.io';
 import { RoomService } from './room.service';
 import { ChatService } from './chat.service';
+import { AuthGuard } from 'src/auth/auth.guard';
 
-@WebSocketGateway(3001, {
-  cors: {
-    origin: '*',
-  },
-})
+@WebSocketGateway(3001)
 export class MyGateway implements OnModuleInit {
   @WebSocketServer()
   server: Server;
@@ -29,6 +26,7 @@ export class MyGateway implements OnModuleInit {
     });
   }
 
+  @UseGuards(AuthGuard)
   @SubscribeMessage('createRoom')
   createRoom(@MessageBody() body: string) {
     this.roomService.createRoom(body);
