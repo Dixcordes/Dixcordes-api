@@ -6,6 +6,7 @@ import { FilesServices } from 'src/utils/files/files-utils.service';
 import * as bcrypt from 'bcrypt';
 import { join } from 'path';
 import { promises as fsPromises } from 'fs';
+import { fileURLToPath } from 'url';
 
 @Injectable()
 export class UsersService {
@@ -123,35 +124,5 @@ export class UsersService {
     }
     await user.destroy();
     return null;
-  }
-
-  async UploadPhoto(
-    file: Express.Multer.File,
-    oldFile: Express.Multer.File,
-  ): Promise<string> {
-    const { originalname } = file;
-    const { path } = oldFile;
-
-    if (!path) {
-      throw new Error("Le chemin d'accès du fichier source est manquant");
-    }
-
-    try {
-      const uniqueFileName = FilesServices.generateUniqueFileName(originalname);
-      const destinationPath = join('files/users', uniqueFileName);
-
-      await fsPromises.rename(path, destinationPath);
-
-      const imageUrl = `${process.env.DEV_URL}${process.env.API_VERSION}${process.env.USER_UPLOAD_LOCATION}${uniqueFileName}`;
-
-      // Supprimez le fichier source après le renommage
-      await fsPromises.unlink(path);
-
-      return imageUrl;
-    } catch (error) {
-      // Supprimez le fichier source en cas d'erreur
-      await fsPromises.unlink(path);
-      throw error;
-    }
   }
 }

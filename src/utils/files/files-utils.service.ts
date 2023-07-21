@@ -6,3 +6,7 @@ export class FilesServices {
     return uniqueFileName;
   }
 }
+
+// export class FilesUpload (file: Express.Multer.File, oldFile: Express.Multer.File): Promise<string> {
+
+// }
