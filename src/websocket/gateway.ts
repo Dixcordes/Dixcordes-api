@@ -1,22 +1,28 @@
-import { OnModuleInit, UseGuards } from '@nestjs/common';
+import { OnModuleInit, UnauthorizedException, UseGuards } from '@nestjs/common';
 import {
   MessageBody,
+  OnGatewayConnection,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
+import { Socket } from 'socket.io';
 import { RoomService } from './room.service';
 import { ChatService } from './chat.service';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { JwtService } from '@nestjs/jwt';
+import { UsersService } from '../users/users.service';
 
-@WebSocketGateway(3001)
+@WebSocketGateway(3001, { namespace: 'chat' })
 export class MyGateway implements OnModuleInit {
   @WebSocketServer()
   server: Server;
   constructor(
     private roomService: RoomService,
     private chatService: ChatService,
+    private jwtService: JwtService,
+    private usersService: UsersService,
   ) {}
 
   onModuleInit() {
@@ -26,7 +32,28 @@ export class MyGateway implements OnModuleInit {
     });
   }
 
-  @UseGuards(AuthGuard)
+  async handleConnection(socket: Socket) {
+    try {
+      const decodedToken = await this.jwtService.verifyAsync(
+        socket.handshake.headers.authorization,
+      );
+      const user = await this.usersService.findOne(decodedToken.sub);
+      if (!user) {
+        console.log('User not found');
+        return this.disconnect(socket);
+      } else {
+        console.log('Connected');
+      }
+    } catch {
+      this.disconnect(socket);
+    }
+  }
+
+  private disconnect(socket: Socket) {
+    socket.emit('Error', new UnauthorizedException());
+    socket.disconnect();
+  }
+
   @SubscribeMessage('createRoom')
   createRoom(@MessageBody() body: string) {
     this.roomService.createRoom(body);
@@ -70,6 +97,7 @@ export class MyGateway implements OnModuleInit {
     }
   }
 
+  @UseGuards(AuthGuard)
   @SubscribeMessage('message')
   onMessage(@MessageBody() body: any) {
     console.log(body);
