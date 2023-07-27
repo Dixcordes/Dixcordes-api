@@ -1,4 +1,4 @@
-import { OnModuleInit, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { UnauthorizedException, UseGuards } from '@nestjs/common';
 import {
   MessageBody,
   OnGatewayConnection,
@@ -15,7 +15,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 
 @WebSocketGateway(3001, { namespace: 'chat' })
-export class MyGateway implements OnModuleInit {
+export class MyGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
   constructor(
@@ -25,8 +25,9 @@ export class MyGateway implements OnModuleInit {
     private usersService: UsersService,
   ) {}
 
-  onModuleInit() {
-    this.server.on('connection', (socket) => {
+  OnGatewayConnection(socket: Socket) {
+    this.handleConnection(socket);
+    this.server.on('connection', (socket: { id: any }) => {
       console.log(socket.id);
       console.log('Connected');
     });
