@@ -35,6 +35,13 @@ export class MyGateway
 
   afterInit(server: Server) {
     console.log('Init');
+    server.use((socket, next) => {
+      if (socket.handshake.headers.authorization) {
+        next();
+      } else {
+        next(new UnauthorizedException());
+      }
+    });
   }
 
   async handleConnection(socket: Socket) {
