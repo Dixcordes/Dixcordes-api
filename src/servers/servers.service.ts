@@ -140,4 +140,35 @@ export class ServersService {
       throw error;
     }
   }
+
+  async getOneMember(serverId: number, userId: number): Promise<User> {
+    try {
+      const server = await this.serverModel.findOne({
+        where: { id: serverId },
+        include: [this.userModel],
+      });
+      const user = await this.userModel.findOne({
+        where: { id: userId },
+      });
+      if (!server) {
+        throw new HttpException('server not found', HttpStatus.NOT_FOUND);
+      } else if (!user) {
+        throw new HttpException('user not found', HttpStatus.NOT_FOUND);
+      }
+      const member = server.members.find((m) => m.id === userId);
+
+      if (!member) {
+        throw new HttpException(
+          'User not found in server members',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      // Utiliser user property pour obtenir l'utilisateur associé au membre
+      console.log(member);
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

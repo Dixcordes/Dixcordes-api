@@ -10,8 +10,6 @@ import {
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { Socket } from 'socket.io';
-import { RoomService } from './room.service';
-import { ChatService } from './chat.service';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 
@@ -27,8 +25,6 @@ export class MyGateway
   @WebSocketServer()
   server: Server;
   constructor(
-    private roomService: RoomService,
-    private chatService: ChatService,
     private jwtService: JwtService,
     private usersService: UsersService,
   ) {}
@@ -67,27 +63,11 @@ export class MyGateway
     console.log('Disconnected');
   }
 
-  // @SubscribeMessage('roomMessage')
-  // sendMessage(
-  //   @MessageBody() data: { roomName: string; userId: string; message: string },
-  // ) {
-  //   this.chatService.sendMessage(data.roomName, data.userId, data.message);
-  // }
-
-  @SubscribeMessage('roomMessage')
+  @SubscribeMessage('serverMessage')
   sendMessage(
-    @MessageBody() data: { roomName: string; userId: string; message: string },
+    @MessageBody() data: { roomId: number; userId: string; message: string },
   ) {
-    const roomMembers = this.roomService.getRoomMembers(data.roomName);
-    if (roomMembers.includes(data.userId)) {
-      //console.log('message', { userId, message });
-      this.server.emit('roomMessage' + data.roomName, {
-        userId: data.userId,
-        message: data.message,
-      });
-    } else {
-      console.log('User not in room');
-    }
+    
   }
 
   @SubscribeMessage('message')

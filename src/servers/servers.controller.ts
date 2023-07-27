@@ -37,4 +37,12 @@ export class ServersController {
   getAllMembers(@Param('serverId') serverId): Promise<User[]> {
     return this.serversService.getAllMembers(serverId);
   }
+
+  @Get('member/:serverId/:userId')
+  getOneMember(
+    @Param('serverId') serverId,
+    @Param('userId') userId,
+  ): Promise<User> {
+    return this.serversService.getOneMember(serverId, userId);
+  }
 }
