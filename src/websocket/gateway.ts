@@ -1,7 +1,9 @@
-import { UnauthorizedException, UseGuards } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 import {
   MessageBody,
   OnGatewayConnection,
+  OnGatewayDisconnect,
+  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -10,7 +12,6 @@ import { Server } from 'socket.io';
 import { Socket } from 'socket.io';
 import { RoomService } from './room.service';
 import { ChatService } from './chat.service';
-import { AuthGuard } from 'src/auth/auth.guard';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 
@@ -20,7 +21,9 @@ import { UsersService } from '../users/users.service';
     origin: '*',
   },
 })
-export class MyGateway implements OnGatewayConnection {
+export class MyGateway
+  implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Server;
   constructor(
@@ -30,36 +33,8 @@ export class MyGateway implements OnGatewayConnection {
     private usersService: UsersService,
   ) {}
 
-  async onGatewayConnection(socket: Socket) {
-    try {
-      const token = this.extractTokenFromHeader(
-        socket.handshake.headers.authorization,
-      );
-      if (!token) {
-        console.log('Token not found');
-        return this.disconnect(socket);
-      }
-
-      const decodedToken = this.jwtService.verify(token);
-      const user = await this.usersService.findOne(decodedToken.sub);
-      if (!user) {
-        console.log('User not found');
-        return this.disconnect(socket);
-      } else {
-        console.log('Connected');
-      }
-    } catch {
-      this.disconnect(socket);
-    }
-  }
-
-  private extractTokenFromHeader(authorizationHeader: string): string | null {
-    if (!authorizationHeader || !authorizationHeader.startsWith('Bearer ')) {
-      return null;
-    }
-
-    const token = authorizationHeader.split(' ')[1];
-    return token;
+  afterInit(server: Server) {
+    console.log('Init');
   }
 
   async handleConnection(socket: Socket) {
@@ -70,18 +45,18 @@ export class MyGateway implements OnGatewayConnection {
       const user = await this.usersService.findOne(decodedToken.sub);
       if (!user) {
         console.log('User not found');
-        return this.disconnect(socket);
+        socket.disconnect();
       } else {
         console.log('Connected');
       }
     } catch {
-      this.disconnect(socket);
+      console.log('Unauthorized');
+      socket.disconnect();
     }
   }
 
-  private disconnect(socket: Socket) {
-    socket.emit('Error', new UnauthorizedException());
-    socket.disconnect();
+  handleDisconnect(socket: Socket) {
+    console.log('Disconnected');
   }
 
   @SubscribeMessage('createRoom')
@@ -127,7 +102,6 @@ export class MyGateway implements OnGatewayConnection {
     }
   }
 
-  @UseGuards(AuthGuard)
   @SubscribeMessage('message')
   onMessage(@MessageBody() body: any) {
     console.log(body);
