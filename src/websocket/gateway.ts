@@ -57,7 +57,7 @@ export class MyGateway
         console.log('Connected');
       }
     } catch {
-      console.log('Unauthorized');
+      console.log(new UnauthorizedException());
       socket.disconnect();
     }
   }
