@@ -111,4 +111,33 @@ export class ServersService {
       throw error;
     }
   }
+
+  async getServer(serverId: number): Promise<Server> {
+    try {
+      const server = await this.serverModel.findOne({
+        where: { id: serverId },
+      });
+      if (!server) {
+        throw new HttpException('server not found', HttpStatus.NOT_FOUND);
+      }
+      return server;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getAllMembers(serverId: number): Promise<User[]> {
+    try {
+      const server = await this.serverModel.findOne({
+        where: { id: serverId },
+      });
+      if (!server) {
+        throw new HttpException('server not found', HttpStatus.NOT_FOUND);
+      }
+      const members = await server.$get('members');
+      return members;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

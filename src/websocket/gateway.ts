@@ -34,7 +34,7 @@ export class MyGateway
   ) {}
 
   afterInit(server: Server) {
-    console.log('Init');
+    console.log('Init the Gateway');
     server.use((socket, next) => {
       if (socket.handshake.headers.authorization) {
         next();
@@ -65,26 +65,6 @@ export class MyGateway
   handleDisconnect(socket: Socket) {
     socket.disconnect();
     console.log('Disconnected');
-  }
-
-  @SubscribeMessage('createRoom')
-  createRoom(@MessageBody() body: string) {
-    this.roomService.createRoom(body);
-  }
-
-  @SubscribeMessage('joinRoom')
-  joinRoom(@MessageBody() data: { roomName: string; userId: string }) {
-    this.roomService.joinRoom(data.roomName, data.userId);
-  }
-
-  @SubscribeMessage('leaveRoom')
-  leaveRoom(@MessageBody() data: { roomName: string; userId: string }) {
-    this.roomService.leaveRoom(data.roomName, data.userId);
-  }
-
-  @SubscribeMessage('getRoomMembers')
-  getRoomMembers(@MessageBody() data: { roomName: string }) {
-    this.roomService.getRoomMembers(data.roomName);
   }
 
   // @SubscribeMessage('roomMessage')
