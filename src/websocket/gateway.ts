@@ -14,7 +14,12 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 
-@WebSocketGateway(3001, { namespace: 'chat' })
+@WebSocketGateway(3001, {
+  namespace: '/chat',
+  cors: {
+    origin: '*',
+  },
+})
 export class MyGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
@@ -25,12 +30,36 @@ export class MyGateway implements OnGatewayConnection {
     private usersService: UsersService,
   ) {}
 
-  OnGatewayConnection(socket: Socket) {
-    this.handleConnection(socket);
-    this.server.on('connection', (socket: { id: any }) => {
-      console.log(socket.id);
-      console.log('Connected');
-    });
+  async onGatewayConnection(socket: Socket) {
+    try {
+      const token = this.extractTokenFromHeader(
+        socket.handshake.headers.authorization,
+      );
+      if (!token) {
+        console.log('Token not found');
+        return this.disconnect(socket);
+      }
+
+      const decodedToken = this.jwtService.verify(token);
+      const user = await this.usersService.findOne(decodedToken.sub);
+      if (!user) {
+        console.log('User not found');
+        return this.disconnect(socket);
+      } else {
+        console.log('Connected');
+      }
+    } catch {
+      this.disconnect(socket);
+    }
+  }
+
+  private extractTokenFromHeader(authorizationHeader: string): string | null {
+    if (!authorizationHeader || !authorizationHeader.startsWith('Bearer ')) {
+      return null;
+    }
+
+    const token = authorizationHeader.split(' ')[1];
+    return token;
   }
 
   async handleConnection(socket: Socket) {
