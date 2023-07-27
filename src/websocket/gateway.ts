@@ -56,6 +56,7 @@ export class MyGateway
   }
 
   handleDisconnect(socket: Socket) {
+    socket.disconnect();
     console.log('Disconnected');
   }
 
