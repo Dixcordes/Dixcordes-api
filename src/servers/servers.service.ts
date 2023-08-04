@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Server } from './server.model';
 import { ServerDto } from './dto/server.dto';
 import { User } from 'src/users/user.model';
+import { ServerUser } from 'src/server-user/server-user.model';
 
 @Injectable()
 export class ServersService {
@@ -11,6 +12,8 @@ export class ServersService {
     private serverModel: typeof Server,
     @InjectModel(User)
     private userModel: typeof User,
+    @InjectModel(ServerUser)
+    private serverUserModel: typeof ServerUser,
   ) {}
 
   async createServer(serverDto: ServerDto, req: string): Promise<Server> {
@@ -155,17 +158,17 @@ export class ServersService {
       } else if (!user) {
         throw new HttpException('user not found', HttpStatus.NOT_FOUND);
       }
-      const member = server.members.find((m) => m.id === userId);
-
+      const member = await this.serverUserModel.findOne({
+        where: { serverId: serverId, userId: userId },
+      });
       if (!member) {
         throw new HttpException(
-          'User not found in server members',
+          'User not found in the server',
           HttpStatus.NOT_FOUND,
         );
       }
 
       // Utiliser user property pour obtenir l'utilisateur associé au membre
-      console.log(member);
       return user;
     } catch (error) {
       throw error;
