@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Server } from './server.model';
 import { ServerDto } from './dto/server.dto';
 import { User } from 'src/users/user.model';
+import { ServerUser } from 'src/server-user/server-user.model';
 
 @Injectable()
 export class ServersService {
@@ -11,6 +12,8 @@ export class ServersService {
     private serverModel: typeof Server,
     @InjectModel(User)
     private userModel: typeof User,
+    @InjectModel(ServerUser)
+    private serverUserModel: typeof ServerUser,
   ) {}
 
   async createServer(serverDto: ServerDto, req: string): Promise<Server> {
@@ -107,6 +110,66 @@ export class ServersService {
 
       await updatedServerData.$remove('members', user);
       return server;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getServer(serverId: number): Promise<Server> {
+    try {
+      const server = await this.serverModel.findOne({
+        where: { id: serverId },
+      });
+      if (!server) {
+        throw new HttpException('server not found', HttpStatus.NOT_FOUND);
+      }
+      return server;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getAllMembers(serverId: number): Promise<User[]> {
+    try {
+      const server = await this.serverModel.findOne({
+        where: { id: serverId },
+      });
+      if (!server) {
+        throw new HttpException('server not found', HttpStatus.NOT_FOUND);
+      }
+      const members = await server.$get('members');
+      return members;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getOneMember(serverId: number, userId: number): Promise<User> {
+    try {
+      const server = await this.serverModel.findOne({
+        where: { id: serverId },
+        include: [this.userModel],
+      });
+      const user = await this.userModel.findOne({
+        where: { id: userId },
+      });
+      if (!server) {
+        throw new HttpException('server not found', HttpStatus.NOT_FOUND);
+      } else if (!user) {
+        throw new HttpException('user not found', HttpStatus.NOT_FOUND);
+      }
+      const member = await this.serverUserModel.findOne({
+        where: { serverId: serverId, userId: userId },
+      });
+      if (!member) {
+        throw new HttpException(
+          'User not found in the server',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      // Utiliser user property pour obtenir l'utilisateur associé au membre
+      return user;
     } catch (error) {
       throw error;
     }

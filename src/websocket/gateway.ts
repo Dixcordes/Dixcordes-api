@@ -1,73 +1,73 @@
-import { OnModuleInit, UseGuards } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 import {
   MessageBody,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import { RoomService } from './room.service';
-import { ChatService } from './chat.service';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { Socket } from 'socket.io';
+import { JwtService } from '@nestjs/jwt';
+import { UsersService } from '../users/users.service';
 
-@WebSocketGateway(3001)
-export class MyGateway implements OnModuleInit {
+@WebSocketGateway(3001, {
+  namespace: '/chat',
+  cors: {
+    origin: '*',
+  },
+})
+export class MyGateway
+  implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Server;
   constructor(
-    private roomService: RoomService,
-    private chatService: ChatService,
+    private jwtService: JwtService,
+    private usersService: UsersService,
   ) {}
 
-  onModuleInit() {
-    this.server.on('connection', (socket) => {
-      console.log(socket.id);
-      console.log('Connected');
+  afterInit(server: Server) {
+    console.log('Init the Gateway');
+    server.use((socket, next) => {
+      if (socket.handshake.headers.authorization) {
+        next();
+      } else {
+        next(new UnauthorizedException());
+      }
     });
   }
 
-  @UseGuards(AuthGuard)
-  @SubscribeMessage('createRoom')
-  createRoom(@MessageBody() body: string) {
-    this.roomService.createRoom(body);
-  }
-
-  @SubscribeMessage('joinRoom')
-  joinRoom(@MessageBody() data: { roomName: string; userId: string }) {
-    this.roomService.joinRoom(data.roomName, data.userId);
-  }
-
-  @SubscribeMessage('leaveRoom')
-  leaveRoom(@MessageBody() data: { roomName: string; userId: string }) {
-    this.roomService.leaveRoom(data.roomName, data.userId);
-  }
-
-  @SubscribeMessage('getRoomMembers')
-  getRoomMembers(@MessageBody() data: { roomName: string }) {
-    this.roomService.getRoomMembers(data.roomName);
-  }
-
-  // @SubscribeMessage('roomMessage')
-  // sendMessage(
-  //   @MessageBody() data: { roomName: string; userId: string; message: string },
-  // ) {
-  //   this.chatService.sendMessage(data.roomName, data.userId, data.message);
-  // }
-
-  @SubscribeMessage('roomMessage')
-  sendMessage(
-    @MessageBody() data: { roomName: string; userId: string; message: string },
-  ) {
-    const roomMembers = this.roomService.getRoomMembers(data.roomName);
-    if (roomMembers.includes(data.userId)) {
-      //console.log('message', { userId, message });
-      this.server.emit('roomMessage' + data.roomName, {
-        userId: data.userId,
-        message: data.message,
-      });
-    } else {
-      console.log('User not in room');
+  async handleConnection(socket: Socket) {
+    try {
+      const decodedToken = await this.jwtService.verifyAsync(
+        socket.handshake.headers.authorization,
+      );
+      const user = await this.usersService.findOne(decodedToken.sub);
+      if (!user) {
+        console.log('User not found');
+        socket.disconnect();
+      } else {
+        console.log('Connected');
+      }
+    } catch {
+      console.log(new UnauthorizedException());
+      socket.disconnect();
     }
+  }
+
+  handleDisconnect(socket: Socket) {
+    socket.disconnect();
+    console.log('Disconnected');
+  }
+
+  @SubscribeMessage('serverMessage')
+  sendMessage(
+    @MessageBody() data: { roomId: number; userId: string; message: string },
+  ) {
+    
   }
 
   @SubscribeMessage('message')
