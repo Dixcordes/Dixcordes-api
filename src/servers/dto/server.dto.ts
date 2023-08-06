@@ -1,5 +1,5 @@
 export class ServerDto {
-  id: number;
+  id: string;
   name: string;
   photo: string;
   isPublic: boolean;

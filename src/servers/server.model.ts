@@ -1,11 +1,23 @@
-import { Column, Model, Table, BelongsToMany } from 'sequelize-typescript';
+import { DataTypes } from 'sequelize';
+import { v4 as uuidv4 } from 'uuid';
+import {
+  Column,
+  Model,
+  Table,
+  BelongsToMany,
+  BeforeCreate,
+} from 'sequelize-typescript';
 import { ServerUser } from 'src/server-user/server-user.model';
 import { User } from 'src/users/user.model';
 
 @Table({ tableName: 'servers' })
 export class Server extends Model {
-  @Column({ primaryKey: true, autoIncrement: true })
-  id: number;
+  @Column({
+    primaryKey: true,
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+  })
+  id: string;
 
   @Column
   name: string;
@@ -27,4 +39,9 @@ export class Server extends Model {
 
   @BelongsToMany(() => User, () => ServerUser)
   members: User[];
+
+  @BeforeCreate
+  static generateUUID(instance: Server) {
+    instance.id = uuidv4();
+  }
 }
