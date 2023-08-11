@@ -14,10 +14,9 @@ import { User } from 'src/users/user.model';
 export class Server extends Model {
   @Column({
     primaryKey: true,
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
+    autoIncrement: true,
   })
-  id: string;
+  id: number;
 
   @Column
   name: string;
@@ -37,11 +36,14 @@ export class Server extends Model {
   @Column({ defaultValue: 1 })
   totalMembers: number;
 
+  @Column({ type: DataTypes.UUID, allowNull: false, defaultValue: uuidv4() })
+  uuid: string;
+
   @BelongsToMany(() => User, () => ServerUser)
   members: User[];
 
   @BeforeCreate
   static generateUUID(instance: Server) {
-    instance.id = uuidv4();
+    instance.uuid = uuidv4();
   }
 }
