@@ -77,7 +77,7 @@ export class MyGateway
     )
       return;
     else if (this.serverService.getOneMember(data.serverId, data.userId)) {
-      this.server.emit(`serverMessage-${server.uuid}`, {
+      this.server.emit(`serverMessage_${server.uuid}`, {
         message: data.message,
         user: data.userId,
       });
