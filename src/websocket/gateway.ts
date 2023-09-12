@@ -12,6 +12,7 @@ import { Server } from 'socket.io';
 import { Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
+import { ServersService } from '../servers/servers.service';
 
 @WebSocketGateway(3001, {
   namespace: '/chat',
@@ -27,6 +28,7 @@ export class MyGateway
   constructor(
     private jwtService: JwtService,
     private usersService: UsersService,
+    private serverService: ServersService,
   ) {}
 
   afterInit(server: Server) {
@@ -64,10 +66,24 @@ export class MyGateway
   }
 
   @SubscribeMessage('serverMessage')
-  sendMessage(
-    @MessageBody() data: { roomId: number; userId: string; message: string },
+  async sendMessage(
+    @MessageBody() data: { serverId: number; userId: number; message: string },
   ) {
-    
+    const server = await this.serverService.getServer(data.serverId);
+    if (
+      data.serverId === undefined ||
+      data.userId === undefined ||
+      data.message === undefined
+    )
+      return;
+    else if (this.serverService.getOneMember(data.serverId, data.userId)) {
+      this.server.emit(`serverMessage_${server.uuid}`, {
+        message: data.message,
+        user: data.userId,
+      });
+    } else {
+      console.log('User not found in the server');
+    }
   }
 
   @SubscribeMessage('message')
