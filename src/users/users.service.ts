@@ -2,11 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './user.model';
 import { UserDto } from './dto/user.dto';
-import { FilesServices } from 'src/utils/files/files-utils.service';
 import * as bcrypt from 'bcrypt';
-import { join } from 'path';
-import { promises as fsPromises } from 'fs';
-import { fileURLToPath } from 'url';
+import * as fs from 'fs';
 
 @Injectable()
 export class UsersService {
@@ -108,6 +105,9 @@ export class UsersService {
       );
     } else if (file !== undefined && file !== null) {
       userDto.photo = file.path;
+      if (user.photo !== '/files/users/default/default_photo.png') {
+        fs.unlinkSync(user.photo);
+      }
     }
     await user.update({
       firstName: userDto.firstName,
