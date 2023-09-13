@@ -106,9 +106,8 @@ export class UsersService {
         'you can only update your own user',
         HttpStatus.UNAUTHORIZED,
       );
-    } else if (file != undefined || '' || null) {
-      const newPhoto = file.filename;
-      userDto.photo = newPhoto;
+    } else if (file !== undefined && file !== null) {
+      userDto.photo = file.path;
     }
     await user.update({
       firstName: userDto.firstName,

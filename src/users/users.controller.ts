@@ -15,6 +15,9 @@ import { User } from 'src/users/user.model';
 import { Public } from 'src/core/decorator/public.decorator';
 import { FileExtensionValidationPipe } from 'src/core/pipes/files-extension.pipe';
 import LocalFilesInterceptor from 'src/core/interceptor/localFiles.interceptor';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname, join } from 'path';
 
 @Controller('users')
 export class UsersController {
@@ -43,9 +46,24 @@ export class UsersController {
 
   @Patch(':id')
   @UseInterceptors(
-    LocalFilesInterceptor({
-      fieldName: Math.random().toString(26).slice(2),
-      path: 'users',
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: (req, file, callback) => {
+          const uploadPath = join(
+            __dirname,
+            '../../',
+            process.env.USER_UPLOAD_LOCATION,
+          );
+          callback(null, uploadPath);
+        },
+        filename: (req, file, callback) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          return callback(null, `${randomName}${extname(file.originalname)}`);
+        },
+      }),
     }),
   )
   update(
