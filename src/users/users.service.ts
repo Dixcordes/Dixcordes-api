@@ -113,8 +113,15 @@ export class UsersService {
     await user.update({
       firstName: userDto.firstName,
       lastName: userDto.lastName,
+      photo: userDto.photo,
     });
-    return user;
+    return {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      photo: user.photo,
+    } as User;
   }
 
   async delete(id: number): Promise<void> {

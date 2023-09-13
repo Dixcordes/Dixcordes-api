@@ -13,8 +13,8 @@ import { UserDto } from 'src/users/dto/user.dto';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/user.model';
 import { Public } from 'src/core/decorator/public.decorator';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { FileExtensionValidationPipe } from 'src/core/pipes/files-extension.pipe';
+import LocalFilesInterceptor from 'src/core/interceptor/localFiles.interceptor';
 
 @Controller('users')
 export class UsersController {
@@ -42,7 +42,12 @@ export class UsersController {
   }
 
   @Patch(':id')
-  @UseInterceptors(FileInterceptor('file'), FileExtensionValidationPipe)
+  @UseInterceptors(
+    LocalFilesInterceptor({
+      fieldName: Math.random().toString(26).slice(2),
+      path: 'users',
+    }),
+  )
   update(
     @UploadedFile() file: Express.Multer.File,
     @Param('id') id: number,
