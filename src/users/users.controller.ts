@@ -13,15 +13,18 @@ import { UserDto } from 'src/users/dto/user.dto';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/user.model';
 import { Public } from 'src/core/decorator/public.decorator';
-import { FileExtensionValidationPipe } from 'src/core/pipes/files-extension.pipe';
-import LocalFilesInterceptor from 'src/core/interceptor/localFiles.interceptor';
+
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
+import { FilesServices } from 'src/utils/files/files-utils.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private filesServices: FilesServices,
+  ) {}
 
   @Public()
   @Post()
@@ -49,19 +52,14 @@ export class UsersController {
     FileInterceptor('file', {
       storage: diskStorage({
         destination: (req, file, callback) => {
-          const uploadPath = join(
-            __dirname,
-            '../../',
-            process.env.USER_UPLOAD_LOCATION,
-          );
+          const uploadPath = FilesServices.uploadFilesPath('user');
           callback(null, uploadPath);
         },
         filename: (req, file, callback) => {
-          const randomName = Array(32)
-            .fill(null)
-            .map(() => Math.round(Math.random() * 16).toString(16))
-            .join('');
-          return callback(null, `${randomName}${extname(file.originalname)}`);
+          const uniqueFileName = FilesServices.generateUniqueFileName(
+            file.originalname,
+          );
+          callback(null, `${uniqueFileName}`);
         },
       }),
     }),
