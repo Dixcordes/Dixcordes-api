@@ -103,12 +103,16 @@ export class UsersService {
         'you can only update your own user',
         HttpStatus.UNAUTHORIZED,
       );
+    } else if (userDto.firstName !== undefined || userDto.firstName !== '') {
+      userDto.firstName = user.firstName;
+    } else if (userDto.lastName !== undefined || userDto.lastName !== '') {
+      userDto.lastName = user.lastName;
     } else if (file !== undefined && file !== null) {
       userDto.photo = file.path;
       if (user.photo !== '/files/users/default/default_photo.png') {
         fs.unlinkSync(user.photo);
       }
-    }
+    } else if (file === undefined || file === null) userDto.photo = user.photo;
     await user.update({
       firstName: userDto.firstName,
       lastName: userDto.lastName,
