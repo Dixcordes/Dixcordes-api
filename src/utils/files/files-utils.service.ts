@@ -11,7 +11,7 @@ export const uploadFilesPath = {
 export class FilesServices {
   static generateUniqueFileName(originalFileName: string): string {
     const fileExt = extname(originalFileName);
-    const uniqueFileName = `${Date.now()}_${originalFileName}_${Math.random().toString(
+    const uniqueFileName = `${Date.now()}${Math.random().toString(
       16,
     )}${fileExt}`;
     return uniqueFileName;
