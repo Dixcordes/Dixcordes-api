@@ -103,9 +103,11 @@ export class UsersService {
         'you can only update your own user',
         HttpStatus.UNAUTHORIZED,
       );
-    } else if (userDto.firstName !== undefined || userDto.firstName !== '') {
+    }
+    if (userDto.firstName == undefined || userDto.firstName == '') {
       userDto.firstName = user.firstName;
-    } else if (userDto.lastName !== undefined || userDto.lastName !== '') {
+    }
+    if (userDto.lastName == undefined || userDto.lastName == '') {
       userDto.lastName = user.lastName;
     } else if (file !== undefined && file !== null) {
       userDto.photo = file.path;
