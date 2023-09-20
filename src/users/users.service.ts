@@ -109,7 +109,8 @@ export class UsersService {
     }
     if (userDto.lastName == undefined || userDto.lastName == '') {
       userDto.lastName = user.lastName;
-    } else if (file !== undefined && file !== null) {
+    }
+    if (file !== undefined && file !== null) {
       userDto.photo = file.path;
       if (user.photo !== '/files/users/default/default_photo.png') {
         fs.unlinkSync(user.photo);
