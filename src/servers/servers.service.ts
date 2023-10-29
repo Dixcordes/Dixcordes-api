@@ -17,16 +17,15 @@ export class ServersService {
   ) {}
 
   async createServer(serverDto: ServerDto, req: string): Promise<Server> {
+    const defaultPhoto = '/files/servers/default/default_photo.png';
     try {
       if (serverDto.name === undefined || serverDto.name === '') {
         throw new HttpException('name is required', HttpStatus.BAD_REQUEST);
-      } else if (serverDto.photo === undefined || serverDto.photo === '') {
-        serverDto.photo = '';
       }
       const serverCreator = req;
       const server = await this.serverModel.create({
         name: serverDto.name,
-        photo: serverDto.photo,
+        photo: defaultPhoto,
         admin: serverCreator,
         servers: [serverCreator, serverDto.members],
         isPublic: serverDto.isPublic,
