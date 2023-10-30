@@ -13,10 +13,8 @@ import { UserDto } from 'src/users/dto/user.dto';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/user.model';
 import { Public } from 'src/core/decorator/public.decorator';
-
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname, join } from 'path';
 import { FilesServices } from 'src/utils/files/files-utils.service';
 
 @Controller('users')
