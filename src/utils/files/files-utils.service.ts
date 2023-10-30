@@ -21,7 +21,7 @@ export class FilesServices {
     if (type === 'user') {
       return join(__dirname, '../../../', uploadFilesPath.user);
     } else if (type === 'server') {
-      return join(__dirname, '../../', uploadFilesPath.server);
+      return join(__dirname, '../../../', uploadFilesPath.server);
     }
   }
 }

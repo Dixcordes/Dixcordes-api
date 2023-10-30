@@ -6,6 +6,7 @@ import { User } from 'src/users/user.model';
 import { ServerUser } from 'src/server-user/server-user.model';
 import { UsersService } from '../users/users.service';
 import * as fs from 'fs';
+import { stringify } from 'querystring';
 
 @Injectable()
 export class ServersService {
@@ -63,10 +64,9 @@ export class ServersService {
     file: Express.Multer.File,
     tokenUserAdminId: number,
   ): Promise<Server> {
-    console.log(serverDto);
     const server = await this.findOne(id);
-    const userId = serverDto.admin;
-    const user = await this.usersService.findOne(userId as unknown as number);
+    const adminId = server.admin;
+    const user = await this.usersService.findOne(Number(adminId));
     if (!server) {
       throw new HttpException('server not found', HttpStatus.NOT_FOUND);
     } else if (id === undefined || id === null) {

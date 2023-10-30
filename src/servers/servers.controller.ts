@@ -74,7 +74,7 @@ export class ServersController {
     FileInterceptor('file', {
       storage: diskStorage({
         destination: (req, file, callback) => {
-          const uploadPath = FilesServices.uploadFilesPath('user');
+          const uploadPath = FilesServices.uploadFilesPath('server');
           callback(null, uploadPath);
         },
         filename: (req, file, callback) => {
