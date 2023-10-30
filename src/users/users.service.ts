@@ -2,11 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './user.model';
 import { UserDto } from './dto/user.dto';
-import { FilesServices } from 'src/utils/files/files-utils.service';
 import * as bcrypt from 'bcrypt';
-import { join } from 'path';
-import { promises as fsPromises } from 'fs';
-import { fileURLToPath } from 'url';
+import * as fs from 'fs';
 
 @Injectable()
 export class UsersService {
@@ -106,15 +103,31 @@ export class UsersService {
         'you can only update your own user',
         HttpStatus.UNAUTHORIZED,
       );
-    } else if (file != undefined || '' || null) {
-      const newPhoto = file.filename;
-      userDto.photo = newPhoto;
     }
+    if (userDto.firstName == undefined || userDto.firstName == '') {
+      userDto.firstName = user.firstName;
+    }
+    if (userDto.lastName == undefined || userDto.lastName == '') {
+      userDto.lastName = user.lastName;
+    }
+    if (file !== undefined && file !== null) {
+      userDto.photo = file.path;
+      if (user.photo !== '/files/users/default/default_photo.png') {
+        fs.unlinkSync(user.photo);
+      }
+    } else if (file === undefined || file === null) userDto.photo = user.photo;
     await user.update({
       firstName: userDto.firstName,
       lastName: userDto.lastName,
+      photo: userDto.photo,
     });
-    return user;
+    return {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      photo: user.photo,
+    } as User;
   }
 
   async delete(id: number): Promise<void> {

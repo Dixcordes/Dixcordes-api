@@ -14,11 +14,15 @@ import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/user.model';
 import { Public } from 'src/core/decorator/public.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { FileExtensionValidationPipe } from 'src/core/pipes/files-extension.pipe';
+import { diskStorage } from 'multer';
+import { FilesServices } from 'src/utils/files/files-utils.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private filesServices: FilesServices,
+  ) {}
 
   @Public()
   @Post()
@@ -42,7 +46,22 @@ export class UsersController {
   }
 
   @Patch(':id')
-  @UseInterceptors(FileInterceptor('file'), FileExtensionValidationPipe)
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: (req, file, callback) => {
+          const uploadPath = FilesServices.uploadFilesPath('user');
+          callback(null, uploadPath);
+        },
+        filename: (req, file, callback) => {
+          const uniqueFileName = FilesServices.generateUniqueFileName(
+            file.originalname,
+          );
+          callback(null, `${uniqueFileName}`);
+        },
+      }),
+    }),
+  )
   update(
     @UploadedFile() file: Express.Multer.File,
     @Param('id') id: number,
