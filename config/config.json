@@ -4,7 +4,8 @@
     "username": "postgres",
     "password": "postgres",
     "database": "cordes",
-    "host": "localhost"
+    "host": "localhost",
+    "port": 5432
   },
   "test": {
     "username": "root",
