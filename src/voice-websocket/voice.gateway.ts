@@ -67,15 +67,17 @@ export class VoiceGateway
   }
 
   @SubscribeMessage('join')
-  async onJoin(@MessageBody() data: { serverId: number }) {
+  async joinRoom(@MessageBody() data: { serverId: number; userId: number }) {
     const server = await this.serverService.findOne(data.serverId);
     if (!server) {
-      return;
+      console.log('Server not found');
+      this.socket.disconnect();
     }
-    server.users.forEach((user) => {
-      server.emit('userJoined', { userId: user.id });
-    });
-    socket.join(server.id.toString());
-    socket.emit('joined', { serverId: server.id });
+    if (!this.serverService.getOneMember(data.serverId, data.userId)) {
+      console.log('User not found in the server');
+      this.socket.disconnect();
+    }
+    this.socket.join(server.name);
+    console.log('Joined room');
   }
 }
