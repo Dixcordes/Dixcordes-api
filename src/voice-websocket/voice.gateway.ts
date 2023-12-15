@@ -7,10 +7,8 @@ import {
   OnGatewayDisconnect,
   WebSocketServer,
   SubscribeMessage,
-  MessageBody,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
-import { Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { ServersService } from 'src/servers/servers.service';
 import { UsersService } from 'src/users/users.service';
 
@@ -31,6 +29,8 @@ export class VoiceGateway
     private usersService: UsersService,
     private serverService: ServersService,
   ) {}
+
+  users: { [key: string]: string } = {};
 
   afterInit(server: Server) {
     console.log('Voice gateway initialized.');
@@ -61,23 +61,24 @@ export class VoiceGateway
     }
   }
 
-  handleDisconnect(socket: Socket) {
-    socket.disconnect();
-    console.log('Disconnected');
+  handleDisconnect(client: Socket) {
+    console.log(`Client disconnected: ${client.id}`);
+    const roomId = this.users[client.id];
+    if (roomId) {
+      delete this.users[client.id];
+      client.leave(roomId);
+    }
   }
 
   @SubscribeMessage('join')
-  async joinRoom(@MessageBody() data: { serverId: number; userId: number }) {
-    const server = await this.serverService.findOne(data.serverId);
-    if (!server) {
-      console.log('Server not found');
-      this.socket.disconnect();
-    }
-    if (!this.serverService.getOneMember(data.serverId, data.userId)) {
-      console.log('User not found in the server');
-      this.socket.disconnect();
-    }
-    this.socket.join(server.name);
-    console.log('Joined room');
+  handleJoin(client: Socket, roomId: string): void {
+    this.users[client.id] = roomId;
+    client.join(roomId);
+  }
+
+  @SubscribeMessage('leave')
+  handleLeave(client: Socket, roomId: string): void {
+    delete this.users[client.id];
+    client.leave(roomId);
   }
 }
