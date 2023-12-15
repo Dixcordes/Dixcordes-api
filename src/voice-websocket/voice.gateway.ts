@@ -8,6 +8,7 @@ import {
   WebSocketServer,
   SubscribeMessage,
 } from '@nestjs/websockets';
+import { json } from 'sequelize';
 import { Server, Socket } from 'socket.io';
 import { ServersService } from 'src/servers/servers.service';
 import { UsersService } from 'src/users/users.service';
@@ -30,7 +31,7 @@ export class VoiceGateway
     private serverService: ServersService,
   ) {}
 
-  users: { [key: string]: string } = {};
+  users: { [key: string]: any } = {};
 
   afterInit(server: Server) {
     console.log('Voice gateway initialized.');
@@ -53,7 +54,7 @@ export class VoiceGateway
         console.log('User not found');
         socket.disconnect();
       } else {
-        console.log('Connected');
+        console.log(`Connected. socket.id: ${socket.id}\n`);
       }
     } catch {
       console.log(new UnauthorizedException());
@@ -71,9 +72,19 @@ export class VoiceGateway
   }
 
   @SubscribeMessage('join')
-  handleJoin(client: Socket, roomId: string): void {
-    this.users[client.id] = roomId;
-    client.join(roomId);
+  handleJoin(data: any, socket: Socket): void {
+    const socketId = socket.id;
+    this.users[socketId] = {};
+    if (typeof data === 'string') {
+      const newData: string[] = data.split(';'); // Utilisation de string[] ici
+      newData[0] = 'data:audio/ogg;';
+      const formattedData = newData.join(';'); // Rejoindre les éléments en une seule chaîne
+
+      for (const id in this.users) {
+        if (id != socketId && !this.users[id].mute && this.users[id].online)
+          socket.broadcast.to(id).emit('send', formattedData);
+      }
+    }
   }
 
   @SubscribeMessage('leave')
