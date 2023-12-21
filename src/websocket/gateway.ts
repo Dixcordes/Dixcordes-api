@@ -1,5 +1,6 @@
 import { UnauthorizedException } from '@nestjs/common';
 import {
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -52,7 +53,7 @@ export class MyGateway
         console.log('User not found');
         socket.disconnect();
       } else {
-        console.log('Connected');
+        console.log('Connected. socket: ', socket.id);
       }
     } catch {
       console.log(new UnauthorizedException());
@@ -87,7 +88,7 @@ export class MyGateway
   }
 
   @SubscribeMessage('message')
-  onMessage(@MessageBody() body: any) {
+  onMessage(@MessageBody() body: any, @ConnectedSocket() socket: Socket) {
     console.log(body);
     this.server.emit('message', {
       message: 'New message',
