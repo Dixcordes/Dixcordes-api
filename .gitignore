@@ -39,3 +39,6 @@ lerna-debug.log*
 # files for the user or the server
 /files/users/*.*
 /files/servers/*.*
+
+# database files
+/database/
