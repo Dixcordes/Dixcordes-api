@@ -11,7 +11,6 @@ import { AuthGuard } from './auth/auth.guard';
 import { ServerUser } from './server-user/server-user.model';
 import { Server } from './servers/server.model';
 import * as config from '../config/config.json';
-import { VoiceGatewayModule } from './voice-websocket/voice.gateway.module';
 
 const DbDevConfig = config.development;
 @Module({
@@ -26,7 +25,6 @@ const DbDevConfig = config.development;
     UsersModule,
     AuthModule,
     MessagesGatewayModule,
-    VoiceGatewayModule,
     ServersModule,
   ],
   controllers: [AppController],
