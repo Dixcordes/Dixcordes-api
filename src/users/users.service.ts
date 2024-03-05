@@ -27,9 +27,6 @@ export class UsersService {
 
   async create(userDto: UserDto): Promise<User> {
     const defaultPhoto = '/files/users/default/default_photo.png';
-    const emailRegex = new RegExp(
-      /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-    );
     try {
       if (userDto.firstName === undefined || userDto.lastName === undefined) {
         throw new HttpException(
