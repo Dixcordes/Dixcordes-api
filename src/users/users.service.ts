@@ -2,7 +2,6 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './user.model';
 import { UserDto } from './dto/user.dto';
-import * as bcrypt from 'bcrypt';
 import * as fs from 'fs';
 
 @Injectable()
@@ -23,44 +22,6 @@ export class UsersService {
 
   async findOneByEmail(email: string): Promise<User> {
     return this.userModel.findOne({ where: { email } });
-  }
-
-  async create(userDto: UserDto): Promise<User> {
-    const defaultPhoto = '/files/users/default/default_photo.png';
-    try {
-      if (userDto.firstName === undefined || userDto.lastName === undefined) {
-        throw new HttpException(
-          'firstName and lastName are required',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-      if (userDto.email === undefined || userDto.email === '') {
-        throw new HttpException('email is required', HttpStatus.BAD_REQUEST);
-      }
-      if (userDto.email) {
-        const existingUser = await this.findOneByEmail(userDto.email);
-        if (existingUser) {
-          throw new HttpException(
-            'email already exists',
-            HttpStatus.BAD_REQUEST,
-          );
-        }
-      }
-      if (userDto.password === undefined || userDto.password === '') {
-        throw new HttpException('password is required', HttpStatus.BAD_REQUEST);
-      }
-      const saltOrRounds = 10;
-      const hashedPassword = await bcrypt.hash(userDto.password, saltOrRounds);
-      return await this.userModel.create({
-        firstName: userDto.firstName,
-        lastName: userDto.lastName,
-        email: userDto.email,
-        photo: defaultPhoto,
-        password: hashedPassword,
-      });
-    } catch (error) {
-      throw error;
-    }
   }
 
   async update(

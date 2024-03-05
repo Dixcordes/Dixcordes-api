@@ -15,7 +15,49 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(userDto: UserDto): Promise<{ access_token: string }> {
+  async SignUp(userDto: UserDto): Promise<User> {
+    const defaultPhoto = '/files/users/default/default_photo.png';
+    try {
+      if (userDto.firstName === undefined || userDto.lastName === undefined) {
+        throw new HttpException(
+          'firstName and lastName are required',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      if (userDto.email === undefined || userDto.email === '') {
+        throw new HttpException('email is required', HttpStatus.BAD_REQUEST);
+      }
+      if (userDto.email) {
+        const existingUser = await this.usersService.findOneByEmail(
+          userDto.email,
+        );
+        if (existingUser) {
+          throw new HttpException(
+            'email already exists',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+      }
+      if (userDto.password === undefined || userDto.password === '') {
+        throw new HttpException('password is required', HttpStatus.BAD_REQUEST);
+      }
+      const saltOrRounds = 10;
+      const hashedPassword = await bcrypt.hash(userDto.password, saltOrRounds);
+      return await this.userModel.create({
+        firstName: userDto.firstName,
+        lastName: userDto.lastName,
+        email: userDto.email,
+        photo: defaultPhoto,
+        password: hashedPassword,
+      });
+    } catch (error) {
+      throw error;
+    } finally {
+      console.log('User Sign Up Attempted');
+    }
+  }
+
+  async SignIn(userDto: UserDto): Promise<{ access_token: string }> {
     try {
       if (userDto.email === undefined || userDto.email === '') {
         throw new HttpException('email is required', HttpStatus.BAD_REQUEST);
@@ -52,6 +94,8 @@ export class AuthService {
       }
     } catch (error) {
       throw error;
+    } finally {
+      console.log('User Sign In Attempted');
     }
   }
 }
