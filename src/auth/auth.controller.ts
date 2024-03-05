@@ -17,14 +17,14 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Public()
-  @Post()
+  @Post('signup')
   create(@Body() userDto: UserDto): Promise<User> {
     return this.authService.SignUp(userDto);
   }
 
   @Public()
   @HttpCode(HttpStatus.OK)
-  @Post('login')
+  @Post('signin')
   signIn(@Body() userDto: UserDto): Promise<{ access_token: string }> {
     return this.authService.SignIn(userDto);
   }
