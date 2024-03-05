@@ -27,22 +27,20 @@ export class UsersService {
 
   async create(userDto: UserDto): Promise<User> {
     const defaultPhoto = '/files/users/default/default_photo.png';
+    const emailRegex = new RegExp(
+      /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+    );
     try {
       if (userDto.firstName === undefined || userDto.lastName === undefined) {
         throw new HttpException(
           'firstName and lastName are required',
           HttpStatus.BAD_REQUEST,
         );
-      } else if (userDto.email === undefined || userDto.email === '') {
+      }
+      if (userDto.email === undefined || userDto.email === '') {
         throw new HttpException('email is required', HttpStatus.BAD_REQUEST);
-      } else if (userDto.email.includes('@') === false) {
-        throw new HttpException(
-          'email must be a valid email address',
-          HttpStatus.BAD_REQUEST,
-        );
-      } else if (userDto.password === undefined || userDto.password === '') {
-        throw new HttpException('password is required', HttpStatus.BAD_REQUEST);
-      } else if (userDto.email) {
+      }
+      if (userDto.email) {
         const existingUser = await this.findOneByEmail(userDto.email);
         if (existingUser) {
           throw new HttpException(
@@ -51,29 +49,8 @@ export class UsersService {
           );
         }
       }
-      switch (userDto.password) {
-        case '123456':
-          throw new HttpException(
-            'password is too common',
-            HttpStatus.BAD_REQUEST,
-          );
-        case 'password':
-          throw new HttpException(
-            'password is too common',
-            HttpStatus.BAD_REQUEST,
-          );
-        case 'password123':
-          throw new HttpException(
-            'password is too common',
-            HttpStatus.BAD_REQUEST,
-          );
-        case 'passw0rd':
-          throw new HttpException(
-            'password is too common',
-            HttpStatus.BAD_REQUEST,
-          );
-        default:
-          break;
+      if (userDto.password === undefined || userDto.password === '') {
+        throw new HttpException('password is required', HttpStatus.BAD_REQUEST);
       }
       const saltOrRounds = 10;
       const hashedPassword = await bcrypt.hash(userDto.password, saltOrRounds);
