@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from 'src/users/user.model';
 import { UserDto } from 'src/users/dto/user.dto';
+import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 
@@ -57,15 +58,20 @@ export class AuthService {
     }
   }
 
-  async SignIn(userDto: UserDto): Promise<{ access_token: string }> {
+  async SignIn(
+    updateUserDto: UpdateUserDto,
+  ): Promise<{ access_token: string }> {
     try {
-      if (userDto.email === undefined || userDto.email === '') {
+      if (updateUserDto.email === undefined || updateUserDto.email === '') {
         throw new HttpException('email is required', HttpStatus.BAD_REQUEST);
-      } else if (userDto.password === undefined || userDto.password === '') {
+      } else if (
+        updateUserDto.password === undefined ||
+        updateUserDto.password === ''
+      ) {
         throw new HttpException('password is required', HttpStatus.BAD_REQUEST);
-      } else if (userDto.email) {
+      } else if (updateUserDto.email) {
         const existingUser = await this.usersService.findOneByEmail(
-          userDto.email,
+          updateUserDto.email,
         );
         if (!existingUser) {
           throw new HttpException(
@@ -74,7 +80,7 @@ export class AuthService {
           );
         }
         const isMatch = await bcrypt.compare(
-          userDto.password,
+          updateUserDto.password,
           existingUser.password,
         );
         if (!isMatch) {

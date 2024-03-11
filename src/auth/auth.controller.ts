@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserDto } from 'src/users/dto/user.dto';
+import { UpdateUserDto } from '../users/dto/update-user.dto';
 import { Public } from 'src/core/decorator/public.decorator';
 import { User } from '../users/user.model';
 
@@ -25,8 +26,10 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('signin')
-  signIn(@Body() userDto: UserDto): Promise<{ access_token: string }> {
-    return this.authService.SignIn(userDto);
+  signIn(
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<{ access_token: string }> {
+    return this.authService.SignIn(updateUserDto);
   }
 
   @Get('profile')
