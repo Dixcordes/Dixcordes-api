@@ -9,20 +9,29 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserDto } from 'src/users/dto/user.dto';
+import { UpdateUserDto } from '../users/dto/update-user.dto';
 import { Public } from 'src/core/decorator/public.decorator';
+import { User } from '../users/user.model';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Public()
-  @HttpCode(HttpStatus.OK)
-  @Post('login')
-  signIn(@Body() userDto: UserDto): Promise<{ access_token: string }> {
-    return this.authService.signIn(userDto);
+  @Post('signup')
+  signup(@Body() userDto: UserDto): Promise<User> {
+    return this.authService.SignUp(userDto);
   }
 
-  //@UseGuards(AuthGuard)
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @Post('signin')
+  signIn(
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<{ access_token: string }> {
+    return this.authService.SignIn(updateUserDto);
+  }
+
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;

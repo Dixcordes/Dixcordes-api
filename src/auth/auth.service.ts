@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from 'src/users/user.model';
 import { UserDto } from 'src/users/dto/user.dto';
+import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 
@@ -15,15 +16,62 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(userDto: UserDto): Promise<{ access_token: string }> {
+  async SignUp(userDto: UserDto): Promise<User> {
+    const defaultPhoto = '/files/users/default/default_photo.png';
     try {
+      if (userDto.firstName === undefined || userDto.lastName === undefined) {
+        throw new HttpException(
+          'firstName and lastName are required',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
       if (userDto.email === undefined || userDto.email === '') {
         throw new HttpException('email is required', HttpStatus.BAD_REQUEST);
-      } else if (userDto.password === undefined || userDto.password === '') {
-        throw new HttpException('password is required', HttpStatus.BAD_REQUEST);
-      } else if (userDto.email) {
+      }
+      if (userDto.email) {
         const existingUser = await this.usersService.findOneByEmail(
           userDto.email,
+        );
+        if (existingUser) {
+          throw new HttpException(
+            'email already exists',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+      }
+      if (userDto.password === undefined || userDto.password === '') {
+        throw new HttpException('password is required', HttpStatus.BAD_REQUEST);
+      }
+      const saltOrRounds = 10;
+      const hashedPassword = await bcrypt.hash(userDto.password, saltOrRounds);
+      return await this.userModel.create({
+        firstName: userDto.firstName,
+        lastName: userDto.lastName,
+        email: userDto.email,
+        photo: defaultPhoto,
+        password: hashedPassword,
+      });
+    } catch (error) {
+      throw error;
+    } finally {
+      console.log('User Sign Up Attempted');
+    }
+  }
+
+  async SignIn(
+    updateUserDto: UpdateUserDto,
+  ): Promise<{ access_token: string }> {
+    try {
+      if (updateUserDto.email === undefined || updateUserDto.email === '') {
+        throw new HttpException('email is required', HttpStatus.BAD_REQUEST);
+      } else if (
+        updateUserDto.password === undefined ||
+        updateUserDto.password === ''
+      ) {
+        throw new HttpException('password is required', HttpStatus.BAD_REQUEST);
+      } else if (updateUserDto.email) {
+        const existingUser = await this.usersService.findOneByEmail(
+          updateUserDto.email,
         );
         if (!existingUser) {
           throw new HttpException(
@@ -32,7 +80,7 @@ export class AuthService {
           );
         }
         const isMatch = await bcrypt.compare(
-          userDto.password,
+          updateUserDto.password,
           existingUser.password,
         );
         if (!isMatch) {
@@ -52,6 +100,8 @@ export class AuthService {
       }
     } catch (error) {
       throw error;
+    } finally {
+      console.log('User Sign In Attempted');
     }
   }
 }

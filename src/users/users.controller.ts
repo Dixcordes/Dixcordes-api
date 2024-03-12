@@ -4,7 +4,6 @@ import {
   Get,
   Param,
   Patch,
-  Post,
   Request,
   UploadedFile,
   UseInterceptors,
@@ -12,7 +11,6 @@ import {
 import { UserDto } from 'src/users/dto/user.dto';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/user.model';
-import { Public } from 'src/core/decorator/public.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { FilesServices } from 'src/utils/files/files-utils.service';
@@ -23,12 +21,6 @@ export class UsersController {
     private usersService: UsersService,
     private filesServices: FilesServices,
   ) {}
-
-  @Public()
-  @Post()
-  create(@Body() userDto: UserDto): Promise<User> {
-    return this.usersService.create(userDto);
-  }
 
   @Get()
   findAll(): Promise<User[]> {
