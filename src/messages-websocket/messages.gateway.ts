@@ -14,9 +14,10 @@ import { Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { ServersService } from '../servers/servers.service';
+import { from } from 'rxjs';
 
-@WebSocketGateway(3001, {
-  namespace: '/chat',
+@WebSocketGateway({
+  namespace: 'chat',
   cors: {
     origin: '*',
   },
@@ -34,7 +35,7 @@ export class MessagesGateway
   ) {}
 
   afterInit(server: Server) {
-    console.log('Messages gateway initialized.');
+    console.log('[WS] Messages gateway initialized.');
     server.use((socket, next) => {
       if (socket.handshake.headers.authorization) {
         next();
@@ -86,10 +87,10 @@ export class MessagesGateway
     )
       return;
     else if (this.serverService.getOneMember(data.serverId, data.userId)) {
-      this.socket.to(server.).emit('serverMessage', {
-        message: data.message,
-        user: data.userId,
-      });
+      // this.socket.to(server.).emit('serverMessage', {
+      //   message: data.message,
+      //   user: data.userId,
+      // });
       // this.server.emit(`serverMessage_${server.uuid}`, {
       //   message: data.message,
       //   user: data.userId,
@@ -100,11 +101,15 @@ export class MessagesGateway
   }
 
   @SubscribeMessage('message')
-  onMessage(@MessageBody() body: any, @ConnectedSocket() socket: Socket) {
-    console.log(body);
+  onMessage(
+    @MessageBody() data: string,
+    @ConnectedSocket() client: Socket,
+  ): string {
     this.server.emit('message', {
       message: 'New message',
-      content: body,
+      content: data,
+      from: client.id,
     });
+    return data;
   }
 }
