@@ -19,7 +19,7 @@ export class AuthController {
 
   @Public()
   @Post('signup')
-  signup(@Body() userDto: UserDto): Promise<User> {
+  signUp(@Body() userDto: UserDto): Promise<User> {
     return this.authService.SignUp(userDto);
   }
 
