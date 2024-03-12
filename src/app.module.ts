@@ -5,7 +5,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from 'src/users/user.model';
 import { UsersModule } from 'src/users/users.module';
 import { AuthModule } from 'src/auth/auth.module';
-import { GatewayModule } from 'src/websocket/gateway.module';
+import { MessagesGatewayModule } from 'src/messages-websocket/messages.gateway.module';
 import { ServersModule } from './servers/servers.module';
 import { AuthGuard } from './auth/auth.guard';
 import { ServerUser } from './server-user/server-user.model';
@@ -24,7 +24,7 @@ const DbDevConfig = config.development;
     }),
     UsersModule,
     AuthModule,
-    GatewayModule,
+    MessagesGatewayModule,
     ServersModule,
   ],
   controllers: [AppController],
