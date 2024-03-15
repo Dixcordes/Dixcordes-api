@@ -1,5 +1,6 @@
 import { UnauthorizedException } from '@nestjs/common';
 import {
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -14,8 +15,8 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { ServersService } from '../servers/servers.service';
 
-@WebSocketGateway(3001, {
-  namespace: '/chat',
+@WebSocketGateway({
+  namespace: 'chat',
   cors: {
     origin: '*',
   },
@@ -25,6 +26,7 @@ export class MessagesGateway
 {
   @WebSocketServer()
   server: Server;
+  socket: Socket;
   constructor(
     private jwtService: JwtService,
     private usersService: UsersService,
@@ -32,7 +34,7 @@ export class MessagesGateway
   ) {}
 
   afterInit(server: Server) {
-    console.log('Messages gateway initialized.');
+    console.log('[WS] Messages gateway initialized.');
     server.use((socket, next) => {
       if (socket.handshake.headers.authorization) {
         next();
@@ -52,7 +54,7 @@ export class MessagesGateway
         console.log('User not found');
         socket.disconnect();
       } else {
-        console.log('Connected');
+        console.log('Connected. socket: ', socket.id);
       }
     } catch {
       console.log(new UnauthorizedException());
@@ -65,33 +67,48 @@ export class MessagesGateway
     console.log('Disconnected');
   }
 
-  @SubscribeMessage('serverMessage')
-  async sendMessage(
-    @MessageBody() data: { serverId: number; userId: number; message: string },
-  ) {
-    const server = await this.serverService.getServer(data.serverId);
-    if (
-      data.serverId === undefined ||
-      data.userId === undefined ||
-      data.message === undefined
-    )
-      return;
-    else if (this.serverService.getOneMember(data.serverId, data.userId)) {
-      this.server.emit(`serverMessage_${server.uuid}`, {
-        message: data.message,
-        user: data.userId,
-      });
-    } else {
-      console.log('User not found in the server');
-    }
-  }
+  // @SubscribeMessage('serverMessage')
+  // async sendMessage(
+  //   @MessageBody()
+  //   data: {
+  //     serverId: number;
+  //     userId: number;
+  //     message: string;
+  //     roomId: number;
+  //   },
+  // ) {
+  //   const roomId = data.roomId || 0;
+  //   const server = await this.serverService.getServer(data.serverId);
+  //   if (
+  //     data.serverId === undefined ||
+  //     data.userId === undefined ||
+  //     data.message === undefined
+  //   )
+  //     return;
+  //   else if (this.serverService.getOneMember(data.serverId, data.userId)) {
+  //     // this.socket.to(server.).emit('serverMessage', {
+  //     //   message: data.message,
+  //     //   user: data.userId,
+  //     // });
+  //     // this.server.emit(`serverMessage_${server.uuid}`, {
+  //     //   message: data.message,
+  //     //   user: data.userId,
+  //     // });
+  //   } else {
+  //     console.log('User not found in the server');
+  //   }
+  // }
 
   @SubscribeMessage('message')
-  onMessage(@MessageBody() body: any) {
-    console.log(body);
+  onMessage(
+    @MessageBody() data: string,
+    @ConnectedSocket() client: Socket,
+  ): string {
     this.server.emit('message', {
       message: 'New message',
-      content: body,
+      content: data,
+      from: client.id,
     });
+    return data;
   }
 }
