@@ -87,11 +87,11 @@ export class ServersController {
     }),
   )
   update(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() photo: Express.Multer.File,
     @Param('id') id: number,
     @Body() serverDto: ServerDto,
     @Request() req,
   ): Promise<Server> {
-    return this.serversService.updateServer(id, serverDto, file, req.user.sub);
+    return this.serversService.updateServer(id, serverDto, photo, req.user.sub);
   }
 }
