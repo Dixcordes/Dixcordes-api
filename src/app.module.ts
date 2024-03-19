@@ -1,32 +1,30 @@
 import { Module } from '@nestjs/common';
-import { AppController } from 'src/app/app.controller';
-import { AppService } from './app/app.service';
+import { AppController } from 'src/features/app/app.controller';
+import { AppService } from './features/app/app.service';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { User } from 'src/users/user.model';
-import { UsersModule } from 'src/users/users.module';
-import { AuthModule } from 'src/auth/auth.module';
-import { GatewayModule } from 'src/websocket/gateway.module';
-import { ServersModule } from './servers/servers.module';
-import { AuthGuard } from './auth/auth.guard';
-import { ServerUser } from './server-user/server-user.model';
-import { Server } from './servers/server.model';
+import { User } from 'src/features/users/user.model';
+import { UsersModule } from 'src/features/users/users.module';
+import { AuthModule } from 'src/features/auth/auth.module';
+import { MessagesGatewayModule } from 'src/features/messages-websocket/messages.gateway.module';
+import { ServersModule } from './features/servers/servers.module';
+import { AuthGuard } from './features/auth/auth.guard';
+import { ServerUser } from './features/server-user/server-user.model';
+import { Server } from './features/servers/server.model';
+import * as config from '../config/config.json';
 
+const DbDevConfig = config.development;
 @Module({
   imports: [
     SequelizeModule.forRoot({
+      ...DbDevConfig,
       dialect: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'postgres',
-      database: 'cordes',
       models: [User, Server, ServerUser],
       autoLoadModels: true,
       synchronize: true,
     }),
     UsersModule,
     AuthModule,
-    GatewayModule,
+    MessagesGatewayModule,
     ServersModule,
   ],
   controllers: [AppController],
