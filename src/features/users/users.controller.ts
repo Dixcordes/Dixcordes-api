@@ -8,9 +8,9 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { UserDto } from 'src/users/dto/user.dto';
-import { UsersService } from 'src/users/users.service';
-import { User } from 'src/users/user.model';
+import { UserDto } from 'src/features/users/dto/user.dto';
+import { UsersService } from 'src/features/users/users.service';
+import { User } from 'src/features/users/user.model';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { FilesServices } from 'src/utils/files/files-utils.service';

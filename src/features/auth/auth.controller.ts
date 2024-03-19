@@ -8,7 +8,7 @@ import {
   Request,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { UserDto } from 'src/users/dto/user.dto';
+import { UserDto } from 'src/features/users/dto/user.dto';
 import { UpdateUserDto } from '../users/dto/update-user.dto';
 import { Public } from 'src/core/decorator/public.decorator';
 import { User } from '../users/user.model';
