@@ -7,4 +7,5 @@ export class UpdateUserDto extends PartialType(UserDto) {
   photo?: string;
   email?: string;
   isAdmin?: boolean;
+  password?: string;
 }

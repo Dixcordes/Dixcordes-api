@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from 'src/users/user.model';
@@ -19,31 +24,18 @@ export class AuthService {
   async SignUp(userDto: UserDto): Promise<User> {
     const defaultPhoto = '/files/users/default/default_photo.png';
     try {
-      if (userDto.firstName === undefined || userDto.lastName === undefined) {
-        throw new HttpException(
-          'firstName and lastName are required',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-      if (userDto.email === undefined || userDto.email === '') {
-        throw new HttpException('email is required', HttpStatus.BAD_REQUEST);
-      }
       if (userDto.email) {
         const existingUser = await this.usersService.findOneByEmail(
           userDto.email,
         );
         if (existingUser) {
-          throw new HttpException(
-            'email already exists',
-            HttpStatus.BAD_REQUEST,
-          );
+          throw new HttpException('email already exists', HttpStatus.CONFLICT);
         }
       }
-      if (userDto.password === undefined || userDto.password === '') {
-        throw new HttpException('password is required', HttpStatus.BAD_REQUEST);
-      }
-      const saltOrRounds = 10;
-      const hashedPassword = await bcrypt.hash(userDto.password, saltOrRounds);
+      const hashedPassword = await bcrypt.hashSync(
+        userDto.password,
+        bcrypt.genSaltSync(10),
+      );
       return await this.userModel.create({
         firstName: userDto.firstName,
         lastName: userDto.lastName,
@@ -74,10 +66,7 @@ export class AuthService {
           updateUserDto.email,
         );
         if (!existingUser) {
-          throw new HttpException(
-            'email does not exist',
-            HttpStatus.BAD_REQUEST,
-          );
+          throw new HttpException('email does not exist', HttpStatus.NOT_FOUND);
         }
         const isMatch = await bcrypt.compare(
           updateUserDto.password,
@@ -86,7 +75,7 @@ export class AuthService {
         if (!isMatch) {
           throw new HttpException(
             'password is incorrect',
-            HttpStatus.BAD_REQUEST,
+            HttpStatus.UNAUTHORIZED,
           );
         }
         const payload = {
