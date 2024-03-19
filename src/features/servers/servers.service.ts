@@ -2,8 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Server } from './server.model';
 import { ServerDto } from './dto/server.dto';
-import { User } from 'src/users/user.model';
-import { ServerUser } from 'src/server-user/server-user.model';
+import { User } from 'src/features/users/user.model';
+import { ServerUser } from 'src/features/server-user/server-user.model';
 import { UsersService } from '../users/users.service';
 import * as fs from 'fs';
 

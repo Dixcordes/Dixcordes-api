@@ -1,6 +1,6 @@
 import { Column, Model, Table, BelongsToMany } from 'sequelize-typescript';
-import { ServerUser } from 'src/server-user/server-user.model';
-import { User } from 'src/users/user.model';
+import { ServerUser } from 'src/features/server-user/server-user.model';
+import { User } from 'src/features/users/user.model';
 
 @Table({ tableName: 'servers' })
 export class Server extends Model {
