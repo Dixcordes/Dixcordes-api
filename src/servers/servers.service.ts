@@ -57,7 +57,7 @@ export class ServersService {
   async updateServer(
     id: number,
     serverDto: ServerDto,
-    file: Express.Multer.File,
+    photo: Express.Multer.File,
     tokenUserAdminId: number,
   ): Promise<Server> {
     const server = await this.findOne(id);
@@ -83,12 +83,12 @@ export class ServersService {
     ) {
       serverDto.name = server.name;
     }
-    if (file !== undefined && file !== null) {
-      serverDto.photo = file.path;
+    if (photo !== undefined && photo !== null) {
+      serverDto.photo = photo.path;
       if (server.photo !== '/files/servers/default/default_photo.png') {
         fs.unlinkSync(server.photo);
       }
-    } else if (file === undefined || file === null)
+    } else if (photo === undefined || photo === null)
       serverDto.photo = server.photo;
     await server.update({
       name: serverDto.name,
