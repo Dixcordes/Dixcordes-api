@@ -2,7 +2,6 @@ import { AuthService } from './auth.service';
 import { getModelToken } from '@nestjs/sequelize';
 import { Test, TestingModule } from '@nestjs/testing';
 import { User } from '../users/user.model';
-import { get } from 'http';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 
@@ -11,6 +10,7 @@ describe('AuthService', () => {
 
   const mockSequelizeUsers = {
     findOne: jest.fn(),
+    create: jest.fn(),
   };
 
   const mockAuthService = {
@@ -40,5 +40,18 @@ describe('AuthService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  it('should return a user', async () => {
+    const user = {
+      id: 1,
+      firstName: 'Test',
+      lastName: 'Test',
+      email: 'testingemail@mail.com',
+      password: 'Testingpassword123!',
+      photo: '',
+      isAdmin: false,
+    };
+    expect(await service.SignUp(user)).toEqual(user);
   });
 });
