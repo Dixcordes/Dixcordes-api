@@ -49,9 +49,19 @@ describe('AuthService', () => {
       lastName: 'Test',
       email: 'testingemail@mail.com',
       password: 'Testingpassword123!',
-      photo: '',
+      photo: '/files/users/default/default_photo.png',
       isAdmin: false,
     };
+    mockSequelizeUsers.create.mockReturnValue(user);
     expect(await service.SignUp(user)).toEqual(user);
   });
+
+  // it('should return a token', async () => {
+  //   const user = {
+  //     email: 'testingemail@mail.com',
+  //     password: 'Testingpassword123!',
+  //   };
+  //   mockSequelizeUsers.findOne.mockReturnValue(user);
+  //   expect(await service.SignIn(user)).toEqual(user);
+  // });
 });
