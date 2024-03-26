@@ -11,6 +11,7 @@ describe('UsersService', () => {
     findAll: jest.fn(),
     findOneByEmail: jest.fn(),
     create: jest.fn(),
+    update: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -66,5 +67,38 @@ describe('UsersService', () => {
     };
     mockSequelizeUsers.findOne.mockReturnValue(user);
     expect(await service.findOneByEmail(userEmail)).toEqual(user);
+  });
+
+  it('should update a user', async () => {
+    const userId = 1;
+    const userDto = {
+      firstName: 'Branko',
+      lastName: 'Brankovic',
+      id: 0,
+      photo: '',
+      email: '',
+      password: '',
+      isAdmin: false,
+    };
+    const user = {
+      id: userId,
+      firstName: 'Test',
+      lastName: 'Test',
+      email: 'testingmail@mail.com',
+      photo: '/files/users/default/default_photo.png',
+      isAdmin: false,
+    };
+    const userUpdated = {
+      id: userId,
+      firstName: userDto.firstName,
+      lastName: userDto.lastName,
+      email: user.email,
+      photo: user.photo,
+    };
+    mockSequelizeUsers.findOne.mockReturnValue(user);
+    mockSequelizeUsers.update.mockReturnValue(user);
+    expect(await service.update(userId, userDto, null, userId)).toEqual(
+      userUpdated,
+    );
   });
 });
