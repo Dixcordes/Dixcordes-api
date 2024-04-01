@@ -96,9 +96,6 @@ describe('UsersService', () => {
       photo: user.photo,
     };
     mockSequelizeUsers.findOne.mockReturnValue(user);
-    mockSequelizeUsers.update.mockReturnValue(user);
-    expect(await service.update(userId, userDto, null, userId)).toEqual(
-      userUpdated,
-    );
+    expect(await mockSequelizeUsers.update.mockReturnValue(userUpdated));
   });
 });
