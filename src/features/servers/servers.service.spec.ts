@@ -6,17 +6,33 @@ import { UsersService } from '../users/users.service';
 import { User } from '../users/user.model';
 import { ServerUser } from '../server-user/server-user.model';
 
+const userId = '4';
+const testServer = {
+  id: 15,
+  photo: '',
+  name: 'testCreateServer',
+  isPublic: false,
+  isActive: true,
+  admin: userId,
+  totalMembers: new Set<number>([1]),
+  members: new Set<string>(['1']),
+};
+
 describe('ServersService', () => {
   let service: ServersService;
 
   const mockSequelizeServers = {
-    create: jest.fn(),
+    create: jest
+      .fn()
+      .mockResolvedValue({ $set: jest.fn().mockResolvedValue(testServer) }),
     findAll: jest.fn(),
     findOne: jest.fn(),
+    $set: jest.fn().mockResolvedValue(2),
   };
 
   const mockSequelizeUsers = {
     findOne: jest.fn(),
+    findAll: jest.fn(),
   };
 
   const mockSequelizeServerUser = {
@@ -58,18 +74,17 @@ describe('ServersService', () => {
 
     it('should return a server when findOne by id', async () => {
       const serverId = 1;
-      const server = {
-        id: serverId,
-        name: 'serverTestName',
-        photo: '/files/servers/default/default_photo.png',
-        isPublic: true,
-        isActive: true,
-        admin: 1,
-        totalMembers: 1,
-        members: 1,
-      };
-      mockSequelizeServers.findOne.mockReturnValue(server);
-      expect(await service.findOne(serverId)).toEqual(server);
+      mockSequelizeServers.findOne.mockReturnValue(testServer);
+      expect(await service.findOne(serverId)).toEqual(testServer);
+    });
+  });
+
+  describe('Create and update a server', () => {
+    it('Should create a server', async () => {
+      mockSequelizeServers.create.mockResolvedValue(testServer);
+      expect(await service.createServer(testServer, userId)).toEqual(
+        testServer,
+      );
     });
   });
 });
