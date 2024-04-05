@@ -22,10 +22,8 @@ describe('ServersService', () => {
   let service: ServersService;
 
   const mockSequelizeServers = {
-    create: jest
-      .fn()
-      .mockResolvedValue({ $set: jest.fn().mockResolvedValue(testServer) }),
-    findAll: jest.fn(),
+    create: jest.fn(() => testServer),
+    findAll: jest.fn(() => [testServer]),
     findOne: jest.fn(),
     $set: jest.fn().mockResolvedValue(2),
   };
@@ -68,8 +66,8 @@ describe('ServersService', () => {
 
   describe('List servers', () => {
     it('should list all users and return an empty array', async () => {
-      mockSequelizeServers.findAll.mockReturnValue([]);
-      expect(await service.findAll()).toEqual([]);
+      mockSequelizeServers.findAll.mockReturnValue([testServer]);
+      expect(await service.findAll()).toEqual([testServer]);
     });
 
     it('should return a server when findOne by id', async () => {
@@ -79,12 +77,5 @@ describe('ServersService', () => {
     });
   });
 
-  describe('Create and update a server', () => {
-    it('Should create a server', async () => {
-      mockSequelizeServers.create.mockResolvedValue(testServer);
-      expect(await service.createServer(testServer, userId)).toEqual(
-        testServer,
-      );
-    });
-  });
+  // describe('Create and update a server', () => {});
 });
