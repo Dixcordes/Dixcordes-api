@@ -20,6 +20,7 @@ const testServer = {
 
 describe('ServersService', () => {
   let service: ServersService;
+  let model: typeof Server;
 
   const mockSequelizeServers = {
     create: jest.fn(() => testServer),
@@ -58,6 +59,7 @@ describe('ServersService', () => {
     }).compile();
 
     service = module.get<ServersService>(ServersService);
+    model = module.get<typeof Server>(getModelToken(Server));
   });
 
   it('should be defined', () => {
@@ -65,17 +67,17 @@ describe('ServersService', () => {
   });
 
   describe('List servers', () => {
-    it('should list all users and return an empty array', async () => {
-      mockSequelizeServers.findAll.mockReturnValue([testServer]);
+    it('should list and return all servers', async () => {
       expect(await service.findAll()).toEqual([testServer]);
     });
 
-    it('should return a server when findOne by id', async () => {
-      const serverId = 1;
-      mockSequelizeServers.findOne.mockReturnValue(testServer);
-      expect(await service.findOne(serverId)).toEqual(testServer);
+    it('should return a single server', async () => {
+      let id: number;
+      const findSpy = jest.spyOn(model, 'findOne');
+      expect(await service.findOne(id));
+      expect(findSpy).toHaveBeenCalledWith({ where: { id: id } });
     });
   });
 
-  // describe('Create and update a server', () => {});
+  // describe('Update and delete a server', () => {});
 });
