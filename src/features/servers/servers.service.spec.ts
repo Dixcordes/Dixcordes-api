@@ -39,11 +39,16 @@ describe('ServersService', () => {
     $set: jest.fn().mockReturnValue(2),
   };
 
+  const $get = {
+    $get: jest.fn().mockReturnValue(2),
+  };
+
   const mockSequelizeServers = {
     create: jest.fn(() => $set),
     findAll: jest.fn(() => [testServer]),
     findOne: jest.fn(),
-    getAllMembers: jest.fn(),
+    getAllMembers: jest.fn(() => $get),
+    updateServer: jest.fn(),
   };
 
   const mockSequelizeUsers = {
@@ -100,31 +105,31 @@ describe('ServersService', () => {
   });
 
   describe('Update and delete a server', () => {
-    // it('should update a server', async () => {
-    //   const updateStub = jest.fn();
-    //   const updatedServer = {
-    //     id: 15,
-    //     photo: '',
-    //     name: 'testUpdateServer',
-    //     isPublic: false,
-    //     isActive: true,
-    //     admin: userId,
-    //     totalMembers: new Set<number>([1]),
-    //     members: new Set<string>(['1']),
-    //   };
-    //   const findSpy = jest.spyOn(model, 'findOne').mockReturnValueOnce({
-    //     update: updateStub,
-    //   } as any);
-    //   expect(
-    //     service.updateServer(
-    //       updatedServer.id,
-    //       updatedServer,
-    //       null,
-    //       testUser.id,
-    //     ),
-    //   );
-    //   expect(findSpy).toHaveBeenCalledWith({ where: { id: id } });
-    // });
+    it('should update a server', async () => {
+      const updateStub = jest.fn();
+      const updatedServer = {
+        id: 15,
+        photo: '',
+        name: 'testUpdateServer',
+        isPublic: false,
+        isActive: true,
+        admin: userId,
+        totalMembers: new Set<number>([1]),
+        members: new Set<string>(['1']),
+      };
+      const findSpy = jest.spyOn(model, 'findOne').mockReturnValueOnce({
+        update: updateStub,
+      } as any);
+      expect(
+        mockSequelizeServers.updateServer(
+          updatedServer.id,
+          updatedServer,
+          null,
+          testUser.id,
+        ),
+      );
+      expect(findSpy).toHaveBeenCalledWith({ where: { id: id } });
+    });
     // it('should remove a server', async () => {
     //   const destroyStub = jest.fn();
     //   const findSpy = jest.spyOn(model, 'findOne').mockReturnValue({
@@ -136,7 +141,6 @@ describe('ServersService', () => {
 
   describe('Server members', () => {
     // it('Should return all members of the server', async () => {
-    //   const findSpy = jest.spyOn(model, 'findOne');
     //   mockSequelizeServers.findOne.mockResolvedValue(testUser);
     //   await expect(service.getAllMembers(id));
     //   expect(findSpy).toHaveBeenCalledWith({ where: { id: id } });
