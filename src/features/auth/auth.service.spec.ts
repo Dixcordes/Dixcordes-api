@@ -8,6 +8,21 @@ import { JwtService } from '@nestjs/jwt';
 describe('AuthService', () => {
   let service: AuthService;
 
+  const TestUser = {
+    id: 1,
+    firstName: 'Test',
+    lastName: 'Test',
+    email: 'testingemail@mail.com',
+    password: 'Testingpassword123!',
+    photo: '/files/users/default/default_photo.png',
+    isAdmin: false,
+  };
+
+  const tokens = {
+    accessToken: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmb29',
+    refreshToken: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmb29',
+  };
+
   const mockSequelizeUsers = {
     findOne: jest.fn(),
     create: jest.fn(),
@@ -62,6 +77,6 @@ describe('AuthService', () => {
   //     password: 'Testingpassword123!',
   //   };
   //   mockSequelizeUsers.findOne.mockReturnValue(user);
-  //   expect(await service.SignIn(user)).toEqual(user);
+  //   expect(await service.SignIn(user));
   // });
 });
