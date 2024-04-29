@@ -3,7 +3,6 @@ import { User } from '../../users/user.model';
 
 @Table({ tableName: 'friends' })
 export class Friends extends Model {
-  @ForeignKey(() => User)
   @Column
   userId: number;
 

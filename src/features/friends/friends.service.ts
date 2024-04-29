@@ -2,7 +2,6 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Friends } from './models/friend.model';
 import { UsersService } from '../users/users.service';
-import { User } from '../users/user.model';
 
 @Injectable()
 export class FriendsService {
@@ -29,11 +28,13 @@ export class FriendsService {
       );
       if (!findUserToAdd)
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-      const requestAlreadySend = this.friendModel.findOne({
-        where: { userId: findUser.id, friendId: findUserToAdd.id },
+      const isRequestAlreadySend = await this.friendModel.findOne({
+        where: { friendId: findUserToAdd.id },
       });
-      // Fix the requestAlreadySend and it's condition
-      if (requestAlreadySend)
+      if (
+        isRequestAlreadySend?.userId === findUser.id &&
+        isRequestAlreadySend?.friendId === findUserToAdd.id
+      )
         throw new HttpException('Request already send', HttpStatus.CONFLICT);
       const newFriendRequest = await this.friendModel.create({
         userId: findUser.id,

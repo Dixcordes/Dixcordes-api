@@ -31,7 +31,4 @@ export class User extends Model {
 
   @BelongsToMany(() => Server, () => ServerUser)
   servers: Server[];
-
-  @BelongsToMany(() => User, () => Friends)
-  friends: Friends[];
 }
