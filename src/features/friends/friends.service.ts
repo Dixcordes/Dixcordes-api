@@ -28,6 +28,11 @@ export class FriendsService {
       );
       if (!findUserToAdd)
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      if (userId === findUserToAdd.id)
+        throw new HttpException(
+          'You cannot add yourself as a friend...',
+          HttpStatus.CONFLICT,
+        );
       const isRequestAlreadySend = await this.friendModel.findOne({
         where: { friendId: findUserToAdd.id },
       });
