@@ -1,5 +1,5 @@
 export class friendsRequestDto {
-  userId: number;
-  friendId: number;
-  response: boolean;
+  from: number;
+  to: number;
+  answer: boolean;
 }

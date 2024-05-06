@@ -20,20 +20,24 @@ export class FriendsRequestService {
     friendId: number,
   ): Promise<FriendsRequest> {
     try {
-      const findUserRequest = await this.friendRequestModel.findOne({
-        where: { userId: userId },
-      });
-      const findFriendToAddRequest = await this.friendRequestModel.findOne({
-        where: { friendId: friendId },
-      });
+      const findUser = await this.usersService.findOne(userId);
+      if (!findUser)
+        throw new HttpException(
+          'Error while sending request',
+          HttpStatus.BAD_REQUEST,
+        );
+      const findUserToAdd = await this.usersService.findOne(friendId);
+      if (!findUserToAdd)
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       const findRequest = await this.friendRequestModel.findOne({
-        where: { friendId: findUserRequest.id },
+        where: { to: findUserToAdd.id },
       });
       if (
-        findRequest?.userId === findUserRequest.id &&
-        findRequest?.friendId === findFriendToAddRequest.id
+        findRequest?.from === findUser.id &&
+        findRequest?.to === findUserToAdd.id
       )
         return findRequest;
+      else throw new HttpException('Request not found', HttpStatus.NOT_FOUND);
     } catch (error) {
       throw error;
     }
@@ -61,17 +65,17 @@ export class FriendsRequestService {
           HttpStatus.CONFLICT,
         );
       const isRequestAlreadySend = await this.friendRequestModel.findOne({
-        where: { friendId: findUserToAdd.id },
+        where: { to: findUserToAdd.id },
       });
       if (
-        isRequestAlreadySend?.userId === findUser.id &&
-        isRequestAlreadySend?.friendId === findUserToAdd.id
+        isRequestAlreadySend?.from === findUser.id &&
+        isRequestAlreadySend?.to === findUserToAdd.id
       )
         throw new HttpException('Request already send', HttpStatus.CONFLICT);
       const newFriendRequest = await this.friendRequestModel.create({
-        userId: findUser.id,
-        friendId: findUserToAdd.id,
-        response: null,
+        from: findUser.id,
+        to: findUserToAdd.id,
+        answer: null,
       });
       return newFriendRequest;
     } catch (error) {

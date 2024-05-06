@@ -10,17 +10,17 @@ import { User } from '../../users/user.model';
 @Table({ tableName: 'friends-request' })
 export class FriendsRequest extends Model {
   @ForeignKey(() => User)
-  userId: number;
+  from: number;
 
   @ForeignKey(() => User)
-  friendId: number;
+  to: number;
 
-  @BelongsTo(() => User, 'userId')
+  @BelongsTo(() => User, 'from')
   user: User;
 
-  @BelongsTo(() => User, 'friendId')
+  @BelongsTo(() => User, 'to')
   friend: User;
 
   @Column({ defaultValue: null })
-  response: boolean;
+  answer: boolean;
 }

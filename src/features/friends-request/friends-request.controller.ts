@@ -6,7 +6,7 @@ import { FriendsRequest } from './model/friend-request.model';
 export class FriendsRequestController {
   constructor(private friendsRequestService: FriendsRequestService) {}
 
-  @Get()
+  @Get('findOneRequest/:addFriendIdRequest')
   findFriendRequest(
     @Param('addFriendIdRequest') addFriendIdRequest,
     @Request() req,
