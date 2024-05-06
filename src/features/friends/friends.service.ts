@@ -2,12 +2,15 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Friends } from './models/friend.model';
 import { UsersService } from '../users/users.service';
+import { FriendsRequest } from './models/friend-request.model';
 
 @Injectable()
 export class FriendsService {
   constructor(
     @InjectModel(Friends)
     private friendModel: typeof Friends,
+    @InjectModel(FriendsRequest)
+    private friendRequestModel: typeof FriendsRequest,
     private usersService: UsersService,
   ) {}
 
@@ -15,7 +18,10 @@ export class FriendsService {
     return this.friendModel.findAll();
   }
 
-  async addFriend(userId: number, userEmailToAdd: string): Promise<Friends> {
+  async sendAddFriendRequest(
+    userId: number,
+    userEmailToAdd: string,
+  ): Promise<FriendsRequest> {
     try {
       const findUser = await this.usersService.findOne(userId);
       if (!findUser)
@@ -33,7 +39,7 @@ export class FriendsService {
           'You cannot add yourself as a friend...',
           HttpStatus.CONFLICT,
         );
-      const isRequestAlreadySend = await this.friendModel.findOne({
+      const isRequestAlreadySend = await this.friendRequestModel.findOne({
         where: { friendId: findUserToAdd.id },
       });
       if (
@@ -41,9 +47,10 @@ export class FriendsService {
         isRequestAlreadySend?.friendId === findUserToAdd.id
       )
         throw new HttpException('Request already send', HttpStatus.CONFLICT);
-      const newFriendRequest = await this.friendModel.create({
+      const newFriendRequest = await this.friendRequestModel.create({
         userId: findUser.id,
         friendId: findUserToAdd.id,
+        response: null,
       });
       return newFriendRequest;
     } catch (error) {

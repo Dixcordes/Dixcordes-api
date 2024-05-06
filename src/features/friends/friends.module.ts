@@ -5,9 +5,10 @@ import { FriendsService } from './friends.service';
 import { FriendsController } from './friends.controller';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/user.model';
+import { FriendsRequest } from './models/friend-request.model';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Friends, User])],
+  imports: [SequelizeModule.forFeature([Friends, User, FriendsRequest])],
   providers: [FriendsService, UsersService],
   controllers: [FriendsController],
   exports: [SequelizeModule],
