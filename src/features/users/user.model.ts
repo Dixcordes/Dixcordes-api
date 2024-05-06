@@ -2,7 +2,7 @@ import { Column, Model, Table, BelongsToMany } from 'sequelize-typescript';
 import { Server } from '../servers/server.model';
 import { ServerUser } from 'src/features/server-user/server-user.model';
 import { Friends } from '../friends/models/friend.model';
-import { FriendsRequest } from '../friends/models/friend-request.model';
+import { FriendsRequest } from '../friends-request/model/friend-request.model';
 
 @Table({ tableName: 'users' })
 export class User extends Model {
