@@ -40,14 +40,11 @@ export class FriendsRequestService {
       if (!findUserToAdd)
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       const findRequest = await this.friendRequestModel.findOne({
-        where: { to: findUserToAdd.id },
+        where: { to: findUserToAdd.id, from: findUser.id },
       });
-      if (
-        findRequest?.from === findUser.id &&
-        findRequest?.to === findUserToAdd.id
-      )
-        return findRequest;
-      else throw new HttpException('Request not found', HttpStatus.NOT_FOUND);
+      if (!findRequest)
+        throw new HttpException('Request not found', HttpStatus.NOT_FOUND);
+      return findRequest;
     } catch (error) {
       console.log(error);
       throw error;
@@ -95,47 +92,32 @@ export class FriendsRequestService {
     }
   }
 
-  async acceptRequest(friendRequestDto: FriendsRequestDto): Promise<Friends> {
+  async answerFriendRequest(
+    friendRequestDto: FriendsRequestDto,
+  ): Promise<Friends | number> {
     try {
       const findRequest = await this.findFriendRequest(
         friendRequestDto.from,
         friendRequestDto.to,
       );
+      console.log(friendRequestDto, findRequest);
       if (!findRequest)
         throw new HttpException('Request not found', HttpStatus.NOT_FOUND);
-      if (friendRequestDto.answer === false)
+      if (friendRequestDto.to === findRequest.to) {
+        if (friendRequestDto.answer === false)
+          return await this.friendRequestModel.destroy({
+            where: { from: friendRequestDto?.from, to: friendRequestDto?.to },
+          });
+        if (friendRequestDto.answer === true)
+          return await this.friendModel.create({
+            userId: friendRequestDto?.from,
+            targetId: friendRequestDto?.to,
+          });
+      } else
         throw new HttpException(
-          'Error while accepting the request',
+          'You cannot accept this request.',
           HttpStatus.BAD_REQUEST,
         );
-      const newFriend = await this.friendModel.create({
-        userId: friendRequestDto?.from,
-        targetId: friendRequestDto?.to,
-      });
-      return newFriend;
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
-  }
-
-  async refuseRequest(friendRequestDto: FriendsRequestDto) {
-    try {
-      const findRequest = await this.findFriendRequest(
-        friendRequestDto.from,
-        friendRequestDto.to,
-      );
-      if (!findRequest)
-        throw new HttpException('Request not found', HttpStatus.NOT_FOUND);
-      if (friendRequestDto.answer === true)
-        throw new HttpException(
-          'Error while refusing the request',
-          HttpStatus.BAD_REQUEST,
-        );
-      const deleteRequest = await this.friendRequestModel.destroy({
-        where: { from: friendRequestDto.from, to: friendRequestDto.to },
-      });
-      return deleteRequest;
     } catch (error) {
       console.log(error);
       throw error;
