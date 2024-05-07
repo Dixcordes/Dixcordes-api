@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Request } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { FriendsService } from './friends.service';
 import { Friends } from './models/friend.model';
 
@@ -9,13 +9,5 @@ export class FriendsController {
   @Get()
   findAll(): Promise<Friends[]> {
     return this.friendsService.findAll();
-  }
-
-  @Post('add/:userEmailToAdd')
-  addFriend(
-    @Param('userEmailToAdd') userEmailToAdd,
-    @Request() req,
-  ): Promise<Friends> {
-    return this.friendsService.addFriend(req.user.sub, userEmailToAdd);
   }
 }

@@ -13,6 +13,8 @@ import { Server } from '../servers/server.model';
 import * as config from '../../../config/config.json';
 import { FriendsModule } from '../friends/friends.module';
 import { Friends } from '../friends/models/friend.model';
+import { FriendsRequest } from '../friends-request/model/friend-request.model';
+import { FriendsRequestModule } from '../friends-request/friends-request.module';
 
 const DbDevConfig = config.development;
 @Module({
@@ -20,7 +22,7 @@ const DbDevConfig = config.development;
     SequelizeModule.forRoot({
       ...DbDevConfig,
       dialect: 'postgres',
-      models: [User, Server, ServerUser, Friends],
+      models: [User, Server, ServerUser, Friends, FriendsRequest],
       autoLoadModels: true,
       synchronize: true,
     }),
@@ -29,6 +31,7 @@ const DbDevConfig = config.development;
     MessagesGatewayModule,
     ServersModule,
     FriendsModule,
+    FriendsRequestModule,
   ],
   controllers: [AppController],
   providers: [

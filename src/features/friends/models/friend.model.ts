@@ -1,10 +1,19 @@
-import { Table, Model, Column } from 'sequelize-typescript';
+import { Table, Model, ForeignKey, Column } from 'sequelize-typescript';
+import { User } from '../../users/user.model';
 
 @Table({ tableName: 'friends' })
 export class Friends extends Model {
-  @Column
+  @ForeignKey(() => User)
+  @Column({ allowNull: false, unique: false, field: 'user_id' })
   userId: number;
 
-  @Column
-  friendId: number;
+  @ForeignKey(() => User)
+  @Column({ allowNull: false, unique: false, field: 'target_id' })
+  targetId: number;
+
+  // @BelongsTo(() => User, 'userId')
+  // user: User;
+
+  // @BelongsTo(() => User, 'targetId')
+  // friend: User;
 }
