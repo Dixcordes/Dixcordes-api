@@ -97,7 +97,6 @@ export class FriendsRequestService {
 
   async acceptRequest(friendRequestDto: FriendsRequestDto): Promise<Friends> {
     try {
-      console.log(friendRequestDto);
       const findRequest = await this.findFriendRequest(
         friendRequestDto.from,
         friendRequestDto.to,
@@ -114,6 +113,29 @@ export class FriendsRequestService {
         targetId: friendRequestDto?.to,
       });
       return newFriend;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async refuseRequest(friendRequestDto: FriendsRequestDto) {
+    try {
+      const findRequest = await this.findFriendRequest(
+        friendRequestDto.from,
+        friendRequestDto.to,
+      );
+      if (!findRequest)
+        throw new HttpException('Request not found', HttpStatus.NOT_FOUND);
+      if (friendRequestDto.answer === true)
+        throw new HttpException(
+          'Error while refusing the request',
+          HttpStatus.BAD_REQUEST,
+        );
+      const deleteRequest = await this.friendRequestModel.destroy({
+        where: { from: friendRequestDto.from, to: friendRequestDto.to },
+      });
+      return deleteRequest;
     } catch (error) {
       console.log(error);
       throw error;
