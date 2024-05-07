@@ -1,4 +1,4 @@
-export class friendsRequestDto {
+export class FriendsRequestDto {
   from: number;
   to: number;
   answer: boolean;

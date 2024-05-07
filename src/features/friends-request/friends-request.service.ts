@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { UsersService } from '../users/users.service';
 import { FriendsRequest } from '../friends-request/model/friend-request.model';
 import { Friends } from '../friends/models/friend.model';
-import { friendsRequestDto } from './dto/friend-request.dto';
+import { FriendsRequestDto } from './dto/friend-request.dto';
 
 @Injectable()
 export class FriendsRequestService {
@@ -49,6 +49,7 @@ export class FriendsRequestService {
         return findRequest;
       else throw new HttpException('Request not found', HttpStatus.NOT_FOUND);
     } catch (error) {
+      console.log(error);
       throw error;
     }
   }
@@ -89,14 +90,15 @@ export class FriendsRequestService {
       });
       return newFriendRequest;
     } catch (error) {
+      console.log(error);
       throw error;
     }
   }
 
-  async acceptRequest(friendRequestDto: friendsRequestDto): Promise<Friends> {
+  async acceptRequest(friendRequestDto: FriendsRequestDto): Promise<Friends> {
     try {
       console.log(friendRequestDto);
-      const findRequest = this.findFriendRequest(
+      const findRequest = await this.findFriendRequest(
         friendRequestDto.from,
         friendRequestDto.to,
       );
@@ -113,6 +115,7 @@ export class FriendsRequestService {
       });
       return newFriend;
     } catch (error) {
+      console.log(error);
       throw error;
     }
   }

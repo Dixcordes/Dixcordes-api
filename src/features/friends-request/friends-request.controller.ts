@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Request } from '@nestjs/common';
 import { FriendsRequestService } from './friends-request.service';
 import { FriendsRequest } from './model/friend-request.model';
-import { friendsRequestDto } from './dto/friend-request.dto';
+import { FriendsRequestDto } from './dto/friend-request.dto';
 import { Friends } from '../friends/models/friend.model';
 
 @Controller('friendsRequest')
@@ -36,9 +36,9 @@ export class FriendsRequestController {
   }
 
   @Post('acceptFriendRequest')
-  acceptFriendrequest(
+  acceptFriendRequest(
     @Request() req,
-    @Body() friendsRequestDto: friendsRequestDto,
+    @Body() friendsRequestDto: FriendsRequestDto,
   ): Promise<Friends> {
     friendsRequestDto = {
       from: req.user.sub,
