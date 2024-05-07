@@ -4,6 +4,7 @@ import { UsersService } from '../users/users.service';
 import { FriendsRequest } from '../friends-request/model/friend-request.model';
 import { Friends } from '../friends/models/friend.model';
 import { FriendsRequestDto } from './dto/friend-request.dto';
+import { FriendsService } from '../friends/friends.service';
 
 @Injectable()
 export class FriendsRequestService {
@@ -13,6 +14,7 @@ export class FriendsRequestService {
     @InjectModel(Friends)
     private friendModel: typeof Friends,
     private usersService: UsersService,
+    private friendsService: FriendsService,
   ) {}
 
   async findAll(): Promise<FriendsRequest[]> {
@@ -95,12 +97,24 @@ export class FriendsRequestService {
   async answerFriendRequest(
     friendRequestDto: FriendsRequestDto,
   ): Promise<Friends | number> {
+    console.log(friendRequestDto);
     try {
+      const alreadyFriend = await this.friendModel.findOne({
+        where: {
+          target_id: friendRequestDto.to,
+          userId: friendRequestDto.from,
+        },
+      });
+      console.log(alreadyFriend);
+      if (alreadyFriend)
+        throw new HttpException(
+          'You are already friend with this user.',
+          HttpStatus.BAD_REQUEST,
+        );
       const findRequest = await this.findFriendRequest(
         friendRequestDto.from,
         friendRequestDto.to,
       );
-      console.log(friendRequestDto, findRequest);
       if (!findRequest)
         throw new HttpException('Request not found', HttpStatus.NOT_FOUND);
       if (friendRequestDto.to === findRequest.to) {
@@ -109,10 +123,13 @@ export class FriendsRequestService {
             where: { from: friendRequestDto?.from, to: friendRequestDto?.to },
           });
         if (friendRequestDto.answer === true)
-          return await this.friendModel.create({
-            userId: friendRequestDto?.from,
-            targetId: friendRequestDto?.to,
+          await this.friendRequestModel.destroy({
+            where: { from: friendRequestDto.from, to: friendRequestDto.to },
           });
+        return await this.friendModel.create({
+          userId: friendRequestDto?.from,
+          targetId: friendRequestDto?.to,
+        });
       } else
         throw new HttpException(
           'You cannot accept this request.',

@@ -6,10 +6,11 @@ import { FriendsRequest } from '../friends-request/model/friend-request.model';
 import { FriendsRequestService } from './friends-request.service';
 import { FriendsRequestController } from './friends-request.controller';
 import { Friends } from '../friends/models/friend.model';
+import { FriendsService } from '../friends/friends.service';
 
 @Module({
   imports: [SequelizeModule.forFeature([User, FriendsRequest, Friends])],
-  providers: [FriendsRequestService, UsersService],
+  providers: [FriendsRequestService, FriendsService, UsersService],
   controllers: [FriendsRequestController],
   exports: [SequelizeModule],
 })
