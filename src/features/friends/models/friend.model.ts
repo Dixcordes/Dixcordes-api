@@ -7,11 +7,11 @@ export class Friends extends Model {
   userId: number;
 
   @ForeignKey(() => User)
-  friendId: number;
+  targetId: number;
 
   @BelongsTo(() => User, 'userId')
   user: User;
 
-  @BelongsTo(() => User, 'friendId')
+  @BelongsTo(() => User, 'targetId')
   friend: User;
 }

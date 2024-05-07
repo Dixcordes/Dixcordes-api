@@ -2,12 +2,16 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { UsersService } from '../users/users.service';
 import { FriendsRequest } from '../friends-request/model/friend-request.model';
+import { Friends } from '../friends/models/friend.model';
+import { friendsRequestDto } from './dto/friend-request.dto';
 
 @Injectable()
 export class FriendsRequestService {
   constructor(
     @InjectModel(FriendsRequest)
     private friendRequestModel: typeof FriendsRequest,
+    @InjectModel(Friends)
+    private friendModel: typeof Friends,
     private usersService: UsersService,
   ) {}
 
@@ -89,27 +93,27 @@ export class FriendsRequestService {
     }
   }
 
-  // async acceptRequest(
-  //   userId: number,
-  //   friendId: number,
-  //   isAccepted: boolean,
-  // ): Promise<Friends> {
-  //   try {
-  //     const findRequest = this.friendRequestModel.findOne({
-  //       where: { userId: userId },
-  //     });
-  //     if (!findRequest)
-  //       throw new HttpException('Request not found', HttpStatus.NOT_FOUND);
-  //     if (isAccepted === false)
-  //       throw new HttpException(
-  //         'Error while accepting the request',
-  //         HttpStatus.BAD_REQUEST,
-  //       );
-  //     const newFriend = await this.friendModel.create({
-  //       userId:
-  //     })
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
+  async acceptRequest(friendRequestDto: friendsRequestDto): Promise<Friends> {
+    try {
+      console.log(friendRequestDto);
+      const findRequest = this.findFriendRequest(
+        friendRequestDto.from,
+        friendRequestDto.to,
+      );
+      if (!findRequest)
+        throw new HttpException('Request not found', HttpStatus.NOT_FOUND);
+      if (friendRequestDto.answer === false)
+        throw new HttpException(
+          'Error while accepting the request',
+          HttpStatus.BAD_REQUEST,
+        );
+      const newFriend = await this.friendModel.create({
+        userId: friendRequestDto.from,
+        targetId: friendRequestDto.to,
+      });
+      return newFriend;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
