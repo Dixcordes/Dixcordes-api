@@ -47,7 +47,7 @@ export class FriendsRequestController {
   answerFriendRequest(
     @Request() req,
     @Body() friendsRequestDto: FriendsRequestDto,
-  ): Promise<Friends | number> {
+  ): Promise<Friends> {
     friendsRequestDto = {
       to: req.user.sub,
       from: friendsRequestDto.from,

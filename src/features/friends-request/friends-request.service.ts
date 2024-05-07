@@ -96,8 +96,7 @@ export class FriendsRequestService {
 
   async answerFriendRequest(
     friendRequestDto: FriendsRequestDto,
-  ): Promise<Friends | number> {
-    console.log(friendRequestDto);
+  ): Promise<Friends> {
     try {
       const alreadyFriend = await this.friendModel.findOne({
         where: {
@@ -105,7 +104,6 @@ export class FriendsRequestService {
           userId: friendRequestDto.from,
         },
       });
-      console.log(alreadyFriend);
       if (alreadyFriend)
         throw new HttpException(
           'You are already friend with this user.',
@@ -118,10 +116,12 @@ export class FriendsRequestService {
       if (!findRequest)
         throw new HttpException('Request not found', HttpStatus.NOT_FOUND);
       if (friendRequestDto.to === findRequest.to) {
-        if (friendRequestDto.answer === false)
-          return await this.friendRequestModel.destroy({
+        if (friendRequestDto.answer === false) {
+          await this.friendRequestModel.destroy({
             where: { from: friendRequestDto?.from, to: friendRequestDto?.to },
           });
+          return;
+        }
         if (friendRequestDto.answer === true)
           await this.friendRequestModel.destroy({
             where: { from: friendRequestDto.from, to: friendRequestDto.to },
