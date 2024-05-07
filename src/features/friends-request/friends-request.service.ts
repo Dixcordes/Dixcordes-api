@@ -108,8 +108,8 @@ export class FriendsRequestService {
           HttpStatus.BAD_REQUEST,
         );
       const newFriend = await this.friendModel.create({
-        userId: friendRequestDto.from,
-        targetId: friendRequestDto.to,
+        userId: friendRequestDto?.from,
+        targetId: friendRequestDto?.to,
       });
       return newFriend;
     } catch (error) {
