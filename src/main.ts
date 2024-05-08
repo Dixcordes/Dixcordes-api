@@ -11,7 +11,7 @@ async function bootstrap() {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
     snapshot: true,
   });
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix(`api/${process.env.API_VERSION}`);
 
   // Use the ValidationPipe to enforce validation rules
   app.useGlobalPipes(new ValidationPipe());
