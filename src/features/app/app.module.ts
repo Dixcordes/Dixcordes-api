@@ -13,10 +13,15 @@ import { Server } from '../servers/server.model';
 import * as config from '../../../config/config.json';
 import { FriendsModule } from '../friends/friends.module';
 import { Friends } from '../friends/models/friend.model';
+import { DevtoolsModule } from '@nestjs/devtools-integration';
 
 const DbDevConfig = config.development;
 @Module({
   imports: [
+    DevtoolsModule.register({
+      http: process.env.NODE_ENV !== 'production',
+      port: parseInt(process.env.API_HTTP_DEVTOOLS_PORT),
+    }),
     SequelizeModule.forRoot({
       ...DbDevConfig,
       dialect: 'postgres',
