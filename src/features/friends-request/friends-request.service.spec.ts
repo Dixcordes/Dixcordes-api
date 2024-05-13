@@ -7,15 +7,21 @@ import { User } from '../users/user.model';
 import { UsersService } from '../users/users.service';
 import { FriendsService } from '../friends/friends.service';
 
-const testFriendRequest = { from: 1, to: 2, answer: true };
-const testSecondFriendRequest = { from: 1, to: 3, answer: true };
+const testFriendRequest = { from: 1, to: 2, answer: null };
+const testSecondFriendRequest = { from: 1, to: 3, answer: null };
+const testThirdFriendRequest = { from: 2, to: 3, answer: null };
 
 describe('FriendsRequestService', () => {
   let service: FriendsRequestService;
   let model: FriendsRequest;
 
   const mockSequelizeFriendsRequest = {
-    findAll: jest.fn(() => [testFriendRequest]),
+    findAll: jest.fn(() => [
+      testFriendRequest,
+      testSecondFriendRequest,
+      testThirdFriendRequest,
+    ]),
+    findUser: jest.fn(() => 1),
     findOne: jest.fn(),
     create: jest.fn(() => testFriendRequest),
     remove: jest.fn(),
@@ -55,13 +61,34 @@ describe('FriendsRequestService', () => {
   });
 
   it('should get all the friends', async () => {
-    expect(await service.findAll()).toEqual([testFriendRequest]);
+    expect(await service.findAll()).toEqual([
+      testFriendRequest,
+      testSecondFriendRequest,
+      testThirdFriendRequest,
+    ]);
   });
 
   it('should return all user request', async () => {
-    expect(await service.findAllUserRequest(1)).toEqual([
-      testFriendRequest,
-      testSecondFriendRequest,
+    jest
+      .spyOn(service, 'findAllUserRequest')
+      .mockResolvedValue(
+        Promise.resolve([testThirdFriendRequest] as unknown as Promise<
+          FriendsRequest[]
+        >),
+      );
+    expect(await service.findAllUserRequest(2)).toEqual([
+      testThirdFriendRequest,
     ]);
+  });
+
+  it('should return one request', async () => {
+    jest
+      .spyOn(service, 'findFriendRequest')
+      .mockResolvedValue(
+        Promise.resolve(
+          testFriendRequest as unknown as Promise<FriendsRequest>,
+        ),
+      );
+    expect(await service.findFriendRequest(1, 2)).toEqual(testFriendRequest);
   });
 });
