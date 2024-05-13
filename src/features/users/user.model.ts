@@ -1,4 +1,10 @@
-import { Column, Model, Table, BelongsToMany } from 'sequelize-typescript';
+import {
+  Column,
+  Model,
+  Table,
+  BelongsToMany,
+  HasMany,
+} from 'sequelize-typescript';
 import { Server } from '../servers/server.model';
 import { ServerUser } from 'src/features/server-user/server-user.model';
 import { Friends } from '../friends/models/friend.model';
@@ -33,9 +39,9 @@ export class User extends Model {
   @BelongsToMany(() => Server, () => ServerUser)
   servers: Server[];
 
-  @BelongsToMany(() => User, () => Friends)
+  @HasMany(() => Friends)
   friends: Friends[];
 
-  @BelongsToMany(() => User, () => FriendsRequest)
+  @HasMany(() => FriendsRequest)
   friendsRequest: FriendsRequest[];
 }
