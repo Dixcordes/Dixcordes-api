@@ -11,6 +11,8 @@ const testFriendRequest = { from: 1, to: 2, answer: null };
 const testSecondFriendRequest = { from: 1, to: 3, answer: null };
 const testThirdFriendRequest = { from: 2, to: 3, answer: null };
 
+const user = { id: 2, email: 'testmail@mail.com' };
+
 describe('FriendsRequestService', () => {
   let service: FriendsRequestService;
   let model: FriendsRequest;
@@ -90,5 +92,18 @@ describe('FriendsRequestService', () => {
         ),
       );
     expect(await service.findFriendRequest(1, 2)).toEqual(testFriendRequest);
+  });
+
+  it('should create a friend request object', async () => {
+    jest
+      .spyOn(service, 'sendAddFriendRequest')
+      .mockResolvedValue(
+        Promise.resolve(
+          testFriendRequest as unknown as Promise<FriendsRequest>,
+        ),
+      );
+    expect(await service.sendAddFriendRequest(1, user.email)).toEqual(
+      testFriendRequest,
+    );
   });
 });
