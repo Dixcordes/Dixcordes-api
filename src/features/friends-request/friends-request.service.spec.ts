@@ -13,6 +13,8 @@ const testThirdFriendRequest = { from: 2, to: 3, answer: null };
 
 const user = { id: 2, email: 'testmail@mail.com' };
 
+const newFriendship = { user_id: 1, target_id: 2 };
+
 describe('FriendsRequestService', () => {
   let service: FriendsRequestService;
   let model: FriendsRequest;
@@ -105,5 +107,14 @@ describe('FriendsRequestService', () => {
     expect(await service.sendAddFriendRequest(1, user.email)).toEqual(
       testFriendRequest,
     );
+  });
+
+  it('should accept or deny an friend request', async () => {
+    jest
+      .spyOn(service, 'answerFriendRequest')
+      .mockResolvedValue(
+        Promise.resolve(newFriendship as unknown as Promise<Friends>),
+      );
+    expect(await service.answerFriendRequest({ from: 1, to: 2, answer: true }));
   });
 });
