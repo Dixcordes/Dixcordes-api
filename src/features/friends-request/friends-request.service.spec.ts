@@ -8,6 +8,7 @@ import { UsersService } from '../users/users.service';
 import { FriendsService } from '../friends/friends.service';
 
 const testFriendRequest = { from: 1, to: 2, answer: true };
+const testSecondFriendRequest = { from: 1, to: 3, answer: true };
 
 describe('FriendsRequestService', () => {
   let service: FriendsRequestService;
@@ -55,5 +56,12 @@ describe('FriendsRequestService', () => {
 
   it('should get all the friends', async () => {
     expect(await service.findAll()).toEqual([testFriendRequest]);
+  });
+
+  it('should return all user request', async () => {
+    expect(await service.findAllUserRequest(1)).toEqual([
+      testFriendRequest,
+      testSecondFriendRequest,
+    ]);
   });
 });

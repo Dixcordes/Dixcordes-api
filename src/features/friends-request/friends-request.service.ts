@@ -21,7 +21,7 @@ export class FriendsRequestService {
     return this.friendRequestModel.findAll();
   }
 
-  async findAllUSerRequest(userId: number): Promise<FriendsRequest[]> {
+  async findAllUserRequest(userId: number): Promise<FriendsRequest[]> {
     return this.friendRequestModel.findAll({
       where: { from: userId },
     });
