@@ -1,6 +1,6 @@
 import { Column, DataType, Model, Table } from 'sequelize-typescript';
 
-enum ChannelsType {
+export enum ChannelsType {
   textual = 'text',
   voice = 'voice',
 }
