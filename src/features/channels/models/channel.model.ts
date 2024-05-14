@@ -1,4 +1,12 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import {
+  BelongsToMany,
+  Column,
+  DataType,
+  Model,
+  Table,
+} from 'sequelize-typescript';
+import { ChannelsServers } from '../../channels-server/models/channel-server.model';
+import { Server } from '../../servers/server.model';
 
 export enum ChannelsType {
   textual = 'text',
@@ -21,6 +29,9 @@ export class Channels extends Model {
     type: DataType.ENUM(...Object.values(ChannelsType)),
   })
   type: ChannelsType;
+
+  @BelongsToMany(() => Server, () => ChannelsServers)
+  server: Server[];
 
   // Create a column for invite user in the channels, create a server invite ?
 }

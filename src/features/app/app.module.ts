@@ -18,6 +18,7 @@ import { FriendsRequestModule } from '../friends-request/friends-request.module'
 import { DevtoolsModule } from '@nestjs/devtools-integration';
 import { ChannelsModule } from '../channels/channel.module';
 import { Channels } from '../channels/models/channel.model';
+import { ChannelsServers } from '../channels-server/models/channel-server.model';
 
 const DbDevConfig = config.development;
 @Module({
@@ -29,7 +30,15 @@ const DbDevConfig = config.development;
     SequelizeModule.forRoot({
       ...DbDevConfig,
       dialect: 'postgres',
-      models: [User, Server, ServerUser, Friends, FriendsRequest, Channels],
+      models: [
+        User,
+        Server,
+        ServerUser,
+        Friends,
+        FriendsRequest,
+        Channels,
+        ChannelsServers,
+      ],
       autoLoadModels: true,
       synchronize: true,
     }),

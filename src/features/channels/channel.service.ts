@@ -10,14 +10,16 @@ export class ChannelsService {
     private channelModel: typeof Channels,
   ) {}
 
-  async finAll(): Promise<Channels[]> {
+  async findAll(): Promise<Channels[]> {
     return this.channelModel.findAll();
   }
 
   async createChannel(channelDto: ChannelDto): Promise<Channels> {
     try {
       const newChannel = await this.channelModel.create({
-        channelDto,
+        name: channelDto.name,
+        type: channelDto.type,
+        isPrivate: channelDto.isPrivate,
       });
       return newChannel;
     } catch (error) {
