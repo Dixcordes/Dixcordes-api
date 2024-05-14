@@ -19,7 +19,7 @@ export class Server extends Model {
   photo: string;
 
   @Column
-  admin: string;
+  admin: number;
 
   @Column({ defaultValue: false })
   isPublic: boolean;

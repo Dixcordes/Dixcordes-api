@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Request } from '@nestjs/common';
 import { ChannelsService } from './channel.service';
 import { Channels } from './models/channel.model';
 import { ChannelDto } from './dto/channel.dto';
@@ -13,7 +13,10 @@ export class ChannelsController {
   }
 
   @Post()
-  createChannel(@Body() channelDto: ChannelDto): Promise<Channels> {
-    return this.channelsService.createChannel(channelDto);
+  createChannel(
+    @Body() channelDto: ChannelDto,
+    @Request() req,
+  ): Promise<Channels> {
+    return this.channelsService.createChannel(channelDto, req.user.sub);
   }
 }
