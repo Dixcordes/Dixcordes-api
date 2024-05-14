@@ -1,0 +1,75 @@
+import { Test } from '@nestjs/testing';
+import { FriendsRequestController } from './friends-request.controller';
+import { FriendsRequestService } from './friends-request.service';
+import { FriendsRequest } from './model/friend-request.model';
+
+const testFriendRequest = { from: 1, to: 2, answer: null };
+const testSecondFriendRequest = { from: 1, to: 3, answer: null };
+const testThirdFriendRequest = { from: 2, to: 3, answer: null };
+
+const user = { id: 2, email: 'testmail@mail.com' };
+
+const newFriendship = { user_id: 1, target_id: 2 };
+
+describe('FriendsRequestController', () => {
+  let controller: FriendsRequestController;
+  let service: FriendsRequestService;
+
+  const mockSequelizeFriendsRequest = {
+    findAll: jest.fn(() => [
+      testFriendRequest,
+      testSecondFriendRequest,
+      testThirdFriendRequest,
+    ]),
+    findUser: jest.fn(() => 1),
+    findOne: jest.fn(),
+    create: jest.fn(() => testFriendRequest),
+    remove: jest.fn(),
+    update: jest.fn(() => testFriendRequest),
+    findFriendRequest: jest.fn(),
+  };
+
+  beforeEach(async () => {
+    const modRef = await Test.createTestingModule({
+      controllers: [FriendsRequestController],
+      providers: [
+        {
+          provide: FriendsRequestService,
+          useValue: mockSequelizeFriendsRequest,
+        },
+      ],
+    }).compile();
+    controller = modRef.get<FriendsRequestController>(FriendsRequestController);
+    service = modRef.get<FriendsRequestService>(FriendsRequestService);
+  });
+
+  it('should be define', async () => {
+    expect(controller).toBeDefined();
+  });
+
+  describe('Get requests', () => {
+    it('should get all the friends requests', async () => {
+      // Mock the findAllUserRequest method and return the expected result
+      jest
+        .spyOn(controller, 'findAllUserRequest')
+        .mockResolvedValue([{ ...testThirdFriendRequest } as FriendsRequest]);
+
+      expect(await controller.findAllUserRequest(2)).toEqual([
+        testThirdFriendRequest,
+      ]);
+    });
+
+    it('should return one request', async () => {
+      jest
+        .spyOn(controller, 'findFriendRequest')
+        .mockResolvedValue({ ...testFriendRequest } as FriendsRequest);
+      jest
+        .spyOn(service, 'findFriendRequest')
+        .mockResolvedValue(testFriendRequest as FriendsRequest); // Cast the object to FriendsRequest
+      expect(controller.findFriendRequest(1, 2)).resolves.toEqual(
+        testFriendRequest,
+      );
+      expect(service.findFriendRequest).toHaveBeenCalled();
+    });
+  });
+});

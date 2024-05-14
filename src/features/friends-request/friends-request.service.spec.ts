@@ -64,7 +64,7 @@ describe('FriendsRequestService', () => {
     model = modRef.get<typeof model>(getModelToken(FriendsRequest));
   });
 
-  it('should get all the friends', async () => {
+  it('should get all the friends requests', async () => {
     expect(await service.findAll()).toEqual([
       testFriendRequest,
       testSecondFriendRequest,
@@ -85,7 +85,7 @@ describe('FriendsRequestService', () => {
     ]);
   });
 
-  it('should return one request', async () => {
+  it('should return one request by the user who send the request and the one receiving it', async () => {
     jest
       .spyOn(service, 'findFriendRequest')
       .mockResolvedValue(
