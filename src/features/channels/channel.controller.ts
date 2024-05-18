@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Request } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Request } from '@nestjs/common';
 import { ChannelsService } from './channel.service';
 import { Channels } from './models/channel.model';
 import { ChannelDto } from './dto/channel.dto';
@@ -10,6 +10,11 @@ export class ChannelsController {
   @Get()
   findAll(): Promise<Channels[]> {
     return this.channelsService.findAll();
+  }
+
+  @Get(':name')
+  findOneByName(@Param('name') name: string): Promise<Channels> {
+    return this.channelsService.findOneByName(name);
   }
 
   @Post()

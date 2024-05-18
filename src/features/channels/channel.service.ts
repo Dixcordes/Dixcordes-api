@@ -20,6 +20,12 @@ export class ChannelsService {
     return this.channelModel.findAll();
   }
 
+  async findOneByName(name: string): Promise<Channels> {
+    return this.channelModel.findOne({
+      where: { name: name },
+    });
+  }
+
   async createChannel(
     channelDto: ChannelDto,
     userId: number,
