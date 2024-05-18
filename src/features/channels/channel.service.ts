@@ -46,8 +46,9 @@ export class ChannelsService {
         isPrivate: channelDto.isPrivate,
       });
 
-      // TO DO
-      // Add the $set sequelize function to add the channels id to channels-server or server
+      await newChannel.$set('server', server, {
+        through: { server: server.id },
+      });
       return newChannel;
     } catch (error) {
       console.log(error);
