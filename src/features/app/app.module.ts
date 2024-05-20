@@ -19,6 +19,7 @@ import { DevtoolsModule } from '@nestjs/devtools-integration';
 import { ChannelsModule } from '../channels/channel.module';
 import { Channels } from '../channels/models/channel.model';
 import { ChannelsServers } from '../channels-server/models/channel-server.model';
+import { ChannelsGatewayModule } from '../channels-websocket/channels-gateway.module';
 
 const DbDevConfig = config.development;
 @Module({
@@ -49,6 +50,7 @@ const DbDevConfig = config.development;
     FriendsModule,
     FriendsRequestModule,
     ChannelsModule,
+    ChannelsGatewayModule,
   ],
   controllers: [AppController],
   providers: [

@@ -34,7 +34,7 @@ export class MessagesGateway
   ) {}
 
   afterInit(server: Server) {
-    console.log('[WS] Messages gateway initialized.');
+    console.log('[WebSocket] Messages gateway initialized.');
     server.use((socket, next) => {
       if (socket.handshake.headers.authorization) {
         next();
