@@ -3,7 +3,8 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Channels } from './models/channel.model';
 import { ChannelDto } from './dto/channel.dto';
 import { Server } from '../servers/server.model';
-import { User } from '../users/user.model';
+import { UpdateChannelDto } from './dto/channel-update.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class ChannelsService {
@@ -12,8 +13,7 @@ export class ChannelsService {
     private channelModel: typeof Channels,
     @InjectModel(Server)
     private serverModel: typeof Server,
-    @InjectModel(User)
-    private userModel: typeof User,
+    private usersService: UsersService,
   ) {}
 
   async findAll(): Promise<Channels[]> {
@@ -36,9 +36,7 @@ export class ChannelsService {
       });
       if (!server)
         throw new HttpException('Server not found', HttpStatus.NOT_FOUND);
-      const user = await this.userModel.findOne({
-        where: { id: userId },
-      });
+      const user = await this.usersService.findOne(userId);
       if (!user)
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       if (server.admin != userId)
@@ -56,6 +54,30 @@ export class ChannelsService {
         through: { server: server.id },
       });
       return newChannel;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async updateChannel(
+    updateChannelDto: UpdateChannelDto,
+    userId: number,
+  ): Promise<Channels> {
+    try {
+      const user = await this.usersService.findOne(Number(userId));
+      if (!user)
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      const channel = await this.channelModel.findOne({
+        where: { id: updateChannelDto.channelId },
+      });
+      if (!channel)
+        throw new HttpException('Channel not found', HttpStatus.NOT_FOUND);
+      await channel.update({
+        name: updateChannelDto.name,
+        isPrivate: updateChannelDto.isPrivate,
+      });
+      return channel;
     } catch (error) {
       console.log(error);
       throw error;

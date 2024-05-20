@@ -1,7 +1,16 @@
-import { Body, Controller, Get, Param, Post, Request } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Request,
+} from '@nestjs/common';
 import { ChannelsService } from './channel.service';
 import { Channels } from './models/channel.model';
 import { ChannelDto } from './dto/channel.dto';
+import { UpdateChannelDto } from './dto/channel-update.dto';
 
 @Controller('channels')
 export class ChannelsController {
@@ -23,5 +32,13 @@ export class ChannelsController {
     @Request() req,
   ): Promise<Channels> {
     return this.channelsService.createChannel(channelDto, req.user.sub);
+  }
+
+  @Patch()
+  updateChannel(
+    @Body() updateChannelDto: UpdateChannelDto,
+    @Request() req,
+  ): Promise<Channels> {
+    return this.channelsService.updateChannel(updateChannelDto, req.user.sub);
   }
 }
