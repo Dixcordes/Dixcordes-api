@@ -6,9 +6,16 @@ import { ServersModule } from 'src/features/servers/servers.module';
 import { ServersService } from 'src/features/servers/servers.service';
 import { ChannelsModule } from '../channels/channel.module';
 import { ChannelsService } from '../channels/channel.service';
+import { UserUtilsWs } from '../../utils/ws/user-utils-ws';
 
 @Module({
   imports: [UsersModule, ServersModule, ChannelsModule],
-  providers: [ChannelsGateway, UsersService, ServersService, ChannelsService],
+  providers: [
+    ChannelsGateway,
+    UsersService,
+    ServersService,
+    ChannelsService,
+    UserUtilsWs,
+  ],
 })
 export class ChannelsGatewayModule {}

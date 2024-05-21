@@ -1,15 +1,20 @@
 import {
+  ConnectedSocket,
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
+  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  WsException,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../users/users.service';
-import { ChannelsService } from '../channels/channel.service';
+import { UsersService } from 'src/features/users/users.service';
+import { ChannelsService } from 'src/features/channels/channel.service';
 import { UnauthorizedException } from '@nestjs/common';
+import { UserUtilsWs } from '../../utils/ws/user-utils-ws';
 
 @WebSocketGateway({
   namespace: 'channel',
@@ -27,6 +32,7 @@ export class ChannelsGateway
     private jwtService: JwtService,
     private usersService: UsersService,
     private channelsService: ChannelsService,
+    private userUtilsWs: UserUtilsWs,
   ) {}
 
   afterInit(server: Server) {
@@ -61,5 +67,44 @@ export class ChannelsGateway
   handleDisconnect(socket: Socket) {
     socket.disconnect();
     console.log('Disconnected');
+  }
+
+  @SubscribeMessage('createChannel')
+  async onMessageInChannel(
+    @MessageBody()
+    channelName: string,
+    @ConnectedSocket() client: Socket,
+  ): Promise<string> {
+    try {
+      const channel = await this.channelsService.findOneByName(channelName);
+      if (!channel) throw new WsException('Channel not found');
+      client.join(channelName);
+      this.server.to(channelName).emit('roomCreated', { room: channelName });
+      this.server.emit('channel', {
+        event: 'roomCreated',
+        room: channelName,
+      });
+      return 'channel created';
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  @SubscribeMessage('joinChannel')
+  async onJoinChannel(
+    @MessageBody() channelName: string,
+    @ConnectedSocket() socket: Socket,
+  ) {
+    try {
+      const findUser = await this.jwtService.verifyAsync(
+        socket.handshake.headers.authorization,
+      );
+      if (!findUser) throw new Error('User not found');
+      console.log(findUser);
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
 }

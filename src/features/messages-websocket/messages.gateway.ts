@@ -9,11 +9,10 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
-import { Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../users/users.service';
-import { ServersService } from '../servers/servers.service';
+import { UsersService } from 'src/features/users/users.service';
+import { ServersService } from 'src/features/servers/servers.service';
 
 @WebSocketGateway({
   namespace: 'chat',
@@ -66,38 +65,6 @@ export class MessagesGateway
     socket.disconnect();
     console.log('Disconnected');
   }
-
-  // @SubscribeMessage('serverMessage')
-  // async sendMessage(
-  //   @MessageBody()
-  //   data: {
-  //     serverId: number;
-  //     userId: number;
-  //     message: string;
-  //     roomId: number;
-  //   },
-  // ) {
-  //   const roomId = data.roomId || 0;
-  //   const server = await this.serverService.getServer(data.serverId);
-  //   if (
-  //     data.serverId === undefined ||
-  //     data.userId === undefined ||
-  //     data.message === undefined
-  //   )
-  //     return;
-  //   else if (this.serverService.getOneMember(data.serverId, data.userId)) {
-  //     // this.socket.to(server.).emit('serverMessage', {
-  //     //   message: data.message,
-  //     //   user: data.userId,
-  //     // });
-  //     // this.server.emit(`serverMessage_${server.uuid}`, {
-  //     //   message: data.message,
-  //     //   user: data.userId,
-  //     // });
-  //   } else {
-  //     console.log('User not found in the server');
-  //   }
-  // }
 
   @SubscribeMessage('message')
   onMessage(
