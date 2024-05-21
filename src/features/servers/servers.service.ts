@@ -231,7 +231,7 @@ export class ServersService {
         );
       }
 
-      // Utiliser user property pour obtenir l'utilisateur associé au membre
+      // Use user property to get the user associate to the member
       return user;
     } catch (error) {
       console.log(error);
