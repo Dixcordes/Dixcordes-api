@@ -8,6 +8,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
   WsException,
+  WsResponse,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
@@ -15,6 +16,8 @@ import { UsersService } from 'src/features/users/users.service';
 import { ChannelsService } from 'src/features/channels/channel.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { UserUtilsWs } from '../../utils/ws/user-utils-ws';
+import { MessageInChannel } from './dto/message-channel.dto';
+import { Observable } from 'rxjs';
 
 @WebSocketGateway({
   namespace: 'channel',
@@ -103,6 +106,27 @@ export class ChannelsGateway
     } catch (error) {
       console.log(error);
       throw new WsException('Error while connecting to the channel');
+    }
+  }
+
+  @SubscribeMessage('messageToChannel')
+  async onSendingMessageInChannel(
+    @MessageBody() messageInChannel: MessageInChannel,
+    @ConnectedSocket() socket: Socket,
+  ) {
+    try {
+      const user = await this.userUtilsWs.FindUserFromWsHandshake(socket);
+      if (!user) throw new Error('User not found');
+      socket.join(messageInChannel.channelName);
+      const author = (messageInChannel.author = user.firstName);
+      socket
+        .to(messageInChannel.channelName)
+        .emit(
+          messageInChannel.channelName,
+          `${author}: ${messageInChannel.message}`,
+        );
+    } catch (error) {
+      console.log(error);
     }
   }
 }
