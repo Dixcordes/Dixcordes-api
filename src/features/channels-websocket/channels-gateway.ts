@@ -78,9 +78,8 @@ export class ChannelsGateway
     try {
       const channel = await this.channelsService.findOneByName(channelName);
       if (!channel) throw new WsException('Channel not found');
-      client.join(channelName);
-      this.server.to(channelName).emit('roomCreated', { room: channelName });
-      this.server.emit('channel', {
+      client.to(channelName).emit('roomCreated', { room: channelName });
+      client.emit('channel', {
         event: 'roomCreated',
         room: channelName,
       });
@@ -97,11 +96,12 @@ export class ChannelsGateway
     @ConnectedSocket() socket: Socket,
   ) {
     try {
-      const findUser = await this.jwtService.verifyAsync(
+      const user = await this.jwtService.verifyAsync(
         socket.handshake.headers.authorization,
       );
-      if (!findUser) throw new Error('User not found');
-      console.log(findUser);
+      if (!user) throw new Error('User not found');
+      socket.join(channelName);
+      this.server.emit(channelName, user.firstName + ' join the channel.');
     } catch (error) {
       console.log(error);
       throw error;
