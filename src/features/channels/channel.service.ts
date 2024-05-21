@@ -5,6 +5,7 @@ import { ChannelDto } from './dto/channel.dto';
 import { Server } from '../servers/server.model';
 import { UpdateChannelDto } from './dto/channel-update.dto';
 import { UsersService } from '../users/users.service';
+import { ChannelsServers } from '../channels-server/models/channel-server.model';
 
 @Injectable()
 export class ChannelsService {
@@ -14,6 +15,8 @@ export class ChannelsService {
     @InjectModel(Server)
     private serverModel: typeof Server,
     private usersService: UsersService,
+    @InjectModel(ChannelsServers)
+    private channelServerModel: typeof ChannelsServers,
   ) {}
 
   async findAll(): Promise<Channels[]> {
@@ -24,6 +27,26 @@ export class ChannelsService {
     return this.channelModel.findOne({
       where: { name: name },
     });
+  }
+
+  async findServerFromChannel(name: string): Promise<Server> {
+    try {
+      const channel = await this.findOneByName(name);
+      if (!channel)
+        throw new HttpException('Channel not found', HttpStatus.NOT_FOUND);
+      const serverId = await this.channelServerModel.findOne({
+        where: { channel_id: channel.id },
+      });
+      const server = await this.serverModel.findOne({
+        where: { id: serverId.id },
+      });
+      if (!server)
+        throw new HttpException('Server not found', HttpStatus.NOT_FOUND);
+      return server;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
 
   async createChannel(
