@@ -86,7 +86,7 @@ export class ChannelsGateway
       return 'channel created';
     } catch (error) {
       console.log(error);
-      throw error;
+      throw new WsException('Error while creating the channel');
     }
   }
 
@@ -96,15 +96,13 @@ export class ChannelsGateway
     @ConnectedSocket() socket: Socket,
   ) {
     try {
-      const user = await this.jwtService.verifyAsync(
-        socket.handshake.headers.authorization,
-      );
+      const user = await this.userUtilsWs.FindUserFromWsHandshake(socket);
       if (!user) throw new Error('User not found');
       socket.join(channelName);
       this.server.emit(channelName, user.firstName + ' join the channel.');
     } catch (error) {
       console.log(error);
-      throw error;
+      throw new WsException('Error while connecting to the channel');
     }
   }
 }

@@ -2,11 +2,13 @@ import { Socket } from 'socket.io';
 import { UsersService } from '../../features/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../../features/users/user.model';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class UserUtilsWs {
   constructor(
-    private usersService: UsersService,
     private jwtService: JwtService,
+    private usersService: UsersService,
   ) {}
 
   async FindUserFromWsHandshake(socket: Socket): Promise<User> {
