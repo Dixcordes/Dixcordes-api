@@ -1,6 +1,8 @@
 import { Column, Model, Table, BelongsToMany } from 'sequelize-typescript';
 import { ServerUser } from 'src/features/server-user/server-user.model';
 import { User } from 'src/features/users/user.model';
+import { Channels } from '../channels/models/channel.model';
+import { ChannelsServers } from '../channels-server/models/channel-server.model';
 
 @Table({ tableName: 'servers' })
 export class Server extends Model {
@@ -17,7 +19,7 @@ export class Server extends Model {
   photo: string;
 
   @Column
-  admin: string;
+  admin: number;
 
   @Column({ defaultValue: false })
   isPublic: boolean;
@@ -30,4 +32,7 @@ export class Server extends Model {
 
   @BelongsToMany(() => User, () => ServerUser)
   members: User[];
+
+  @BelongsToMany(() => Channels, () => ChannelsServers)
+  channels: Channels[];
 }
