@@ -7,10 +7,6 @@ const testFriendRequest = { from: 1, to: 2, answer: null };
 const testSecondFriendRequest = { from: 1, to: 3, answer: null };
 const testThirdFriendRequest = { from: 2, to: 3, answer: null };
 
-const user = { id: 2, email: 'testmail@mail.com' };
-
-const newFriendship = { user_id: 1, target_id: 2 };
-
 const mockReq = { user: { sub: 2 } };
 
 describe('FriendsRequestController', () => {
