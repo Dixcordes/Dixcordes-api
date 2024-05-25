@@ -38,7 +38,7 @@ export class ChannelsService {
         where: { channel_id: channel.id },
       });
       const server = await this.serverModel.findOne({
-        where: { id: serverId.id },
+        where: { id: serverId.server_id },
       });
       if (!server)
         throw new HttpException('Server not found', HttpStatus.NOT_FOUND);

@@ -8,7 +8,6 @@ import {
   WebSocketGateway,
   WebSocketServer,
   WsException,
-  WsResponse,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
@@ -16,8 +15,8 @@ import { UsersService } from 'src/features/users/users.service';
 import { ChannelsService } from 'src/features/channels/channel.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { UserUtilsWs } from '../../utils/ws/user-utils-ws';
-import { MessageInChannel } from './dto/message-channel.dto';
-import { Observable } from 'rxjs';
+import { MessageInChannelDto } from './dto/message-channel.dto';
+import { ServersService } from '../servers/servers.service';
 
 @WebSocketGateway({
   namespace: 'channel',
@@ -36,6 +35,7 @@ export class ChannelsGateway
     private usersService: UsersService,
     private channelsService: ChannelsService,
     private userUtilsWs: UserUtilsWs,
+    private serverService: ServersService,
   ) {}
 
   afterInit(server: Server) {
@@ -101,32 +101,55 @@ export class ChannelsGateway
     try {
       const user = await this.userUtilsWs.FindUserFromWsHandshake(socket);
       if (!user) throw new Error('User not found');
+      const channel = await this.channelsService.findOneByName(channelName);
+      if (!channel) throw new Error('User not found');
+      const server = await this.channelsService.findServerFromChannel(
+        channelName,
+      );
+      if (!server)
+        throw new WsException(`${channelName} is not part of a server`);
       socket.join(channelName);
       this.server.emit(channelName, user.firstName + ' join the channel.');
     } catch (error) {
       console.log(error);
-      throw new WsException('Error while connecting to the channel');
+      throw new WsException(error);
     }
   }
 
   @SubscribeMessage('messageToChannel')
   async onSendingMessageInChannel(
-    @MessageBody() messageInChannel: MessageInChannel,
+    @MessageBody() messageInChannelDto: MessageInChannelDto,
     @ConnectedSocket() socket: Socket,
   ) {
     try {
       const user = await this.userUtilsWs.FindUserFromWsHandshake(socket);
       if (!user) throw new Error('User not found');
-      socket.join(messageInChannel.channelName);
-      const author = (messageInChannel.author = user.firstName);
+      const server = await this.channelsService.findServerFromChannel(
+        messageInChannelDto.channelName,
+      );
+      if (!server)
+        throw new WsException(
+          `${messageInChannelDto.channelName} is not part of a server`,
+        );
+      const isUserInServer = await this.serverService.getOneMember(
+        server.id,
+        user.id,
+      );
+      if (!isUserInServer)
+        throw new WsException(
+          'You are not allowed to send message in this channel.',
+        );
+      socket.join(messageInChannelDto.channelName);
+      const author = (messageInChannelDto.author = user.firstName);
       socket
-        .to(messageInChannel.channelName)
+        .to(messageInChannelDto.channelName)
         .emit(
-          messageInChannel.channelName,
-          `${author}: ${messageInChannel.message}`,
+          messageInChannelDto.channelName,
+          `${author}: ${messageInChannelDto.message}`,
         );
     } catch (error) {
       console.log(error);
+      throw new WsException(error);
     }
   }
 }
