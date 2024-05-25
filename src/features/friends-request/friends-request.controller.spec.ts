@@ -11,6 +11,8 @@ const user = { id: 2, email: 'testmail@mail.com' };
 
 const newFriendship = { user_id: 1, target_id: 2 };
 
+const mockReq = { user: { sub: 2 } };
+
 describe('FriendsRequestController', () => {
   let controller: FriendsRequestController;
   let service: FriendsRequestService;
@@ -21,6 +23,7 @@ describe('FriendsRequestController', () => {
       testSecondFriendRequest,
       testThirdFriendRequest,
     ]),
+    findAllUserRequest: jest.fn(),
     findUser: jest.fn(() => 1),
     findOne: jest.fn(),
     create: jest.fn(() => testFriendRequest),
@@ -43,30 +46,36 @@ describe('FriendsRequestController', () => {
     service = modRef.get<FriendsRequestService>(FriendsRequestService);
   });
 
-  it('should be define', async () => {
+  it('controller should be define', async () => {
     expect(controller).toBeDefined();
+  });
+
+  it('service should be define', async () => {
+    expect(service).toBeDefined();
   });
 
   describe('Get requests', () => {
     it('should get all the friends requests', async () => {
       // Mock the findAllUserRequest method and return the expected result
       jest
-        .spyOn(controller, 'findAllUserRequest')
+        .spyOn(service, 'findAllUserRequest')
         .mockResolvedValue([{ ...testThirdFriendRequest } as FriendsRequest]);
 
-      expect(await controller.findAllUserRequest(2)).toEqual([
-        testThirdFriendRequest,
+      expect(await controller.findAllUserRequest(mockReq)).toEqual([
+        { ...testThirdFriendRequest },
       ]);
+      expect(service.findAllUserRequest).toHaveBeenCalled();
     });
 
     it('should return one request', async () => {
-      jest
-        .spyOn(controller, 'findFriendRequest')
-        .mockResolvedValue({ ...testFriendRequest } as FriendsRequest);
+      // jest
+      //   .spyOn(controller, 'findFriendRequest')
+      //   .mockResolvedValue({ ...testFriendRequest } as FriendsRequest);
       jest
         .spyOn(service, 'findFriendRequest')
         .mockResolvedValue(testFriendRequest as FriendsRequest); // Cast the object to FriendsRequest
-      expect(controller.findFriendRequest(1, 2)).resolves.toEqual(
+
+      expect(await controller.findFriendRequest(1, mockReq)).toEqual(
         testFriendRequest,
       );
       expect(service.findFriendRequest).toHaveBeenCalled();
