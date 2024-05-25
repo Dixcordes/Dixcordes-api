@@ -10,7 +10,7 @@ export class FriendsRequestController {
 
   @Get('findAllRequest')
   findAllUserRequest(@Request() req): Promise<FriendsRequest[]> {
-    return this.friendsRequestService.findAllUSerRequest(req.user.sub);
+    return this.friendsRequestService.findAllUserRequest(req.user.sub);
   }
 
   @Get('findOneRequest/:addFriendIdRequest')
