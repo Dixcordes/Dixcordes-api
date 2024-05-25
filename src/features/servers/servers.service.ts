@@ -50,6 +50,7 @@ export class ServersService {
       });
       return server;
     } catch (error) {
+      console.log(error);
       throw error;
     }
   }
@@ -136,6 +137,7 @@ export class ServersService {
       });
       return server;
     } catch (error) {
+      console.log(error);
       throw error;
     }
   }
@@ -169,6 +171,7 @@ export class ServersService {
       await updatedServerData.$remove('members', user);
       return server;
     } catch (error) {
+      console.log(error);
       throw error;
     }
   }
@@ -183,6 +186,7 @@ export class ServersService {
       }
       return server;
     } catch (error) {
+      console.log(error);
       throw error;
     }
   }
@@ -198,6 +202,7 @@ export class ServersService {
       const members = await server.$get('members');
       return members;
     } catch (error) {
+      console.log(error);
       throw error;
     }
   }
@@ -226,9 +231,10 @@ export class ServersService {
         );
       }
 
-      // Utiliser user property pour obtenir l'utilisateur associé au membre
+      // Use user property to get the user associate to the member
       return user;
     } catch (error) {
+      console.log(error);
       throw error;
     }
   }
