@@ -104,9 +104,9 @@ describe('FriendsRequestService', () => {
           testFriendRequest as unknown as Promise<FriendsRequest>,
         ),
       );
-    expect(await service.sendAddFriendRequest(1, user.email)).toEqual(
-      testFriendRequest,
-    );
+    expect(
+      await service.sendAddFriendRequest({ from: 1, to: user.email }),
+    ).toEqual(testFriendRequest);
   });
 
   it('should accept or deny an friend request', async () => {
