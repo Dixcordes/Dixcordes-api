@@ -64,12 +64,9 @@ describe('FriendsRequestController', () => {
     });
 
     it('should return one request', async () => {
-      // jest
-      //   .spyOn(controller, 'findFriendRequest')
-      //   .mockResolvedValue({ ...testFriendRequest } as FriendsRequest);
       jest
         .spyOn(service, 'findFriendRequest')
-        .mockResolvedValue(testFriendRequest as FriendsRequest); // Cast the object to FriendsRequest
+        .mockResolvedValue(testFriendRequest as FriendsRequest);
 
       expect(await controller.findFriendRequest(1, mockReq)).toEqual(
         testFriendRequest,
