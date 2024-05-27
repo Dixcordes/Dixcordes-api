@@ -6,9 +6,12 @@ import { ServersService } from './servers.service';
 import { ServerUser } from '../server-user/server-user.model';
 import { User } from 'src/features/users/user.model';
 import { UsersService } from 'src/features/users/users.service';
+import { ChannelsServers } from '../channels-server/models/channel-server.model';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Server, ServerUser, User])],
+  imports: [
+    SequelizeModule.forFeature([Server, ServerUser, User, ChannelsServers]),
+  ],
   providers: [ServersService, UsersService],
   controllers: [ServersController],
   exports: [SequelizeModule],

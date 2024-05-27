@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpException,
   Param,
   Patch,
   Post,
@@ -18,6 +20,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { FilesServices } from 'src/utils/files/files-utils.service';
 import { ServerAccessDto } from './dto/server-access.dto';
+import { ServerDeleteDto } from './dto/server-delete.dto';
 
 @Controller('servers')
 export class ServersController {
@@ -82,6 +85,14 @@ export class ServersController {
     @Param('userId') userId,
   ): Promise<User> {
     return this.serversService.getOneMember(serverId, userId);
+  }
+
+  @Delete()
+  deleteServer(
+    @Body() serverDeleteDto: ServerDeleteDto,
+    @Request() req,
+  ): Promise<HttpException> {
+    return this.serversService.deleteServer(serverDeleteDto, req.user.sub);
   }
 
   @Patch(':id')
