@@ -277,10 +277,10 @@ export class ServersService {
         where: { id: server.id },
       });
       await this.serverUserModel.destroy({
-        where: { id: server.id },
+        where: { serverId: server.id },
       });
       await this.channelsServerModel.destroy({
-        where: { id: server.id },
+        where: { server_id: server.id },
       });
       return new HttpException('Server delete successfully', HttpStatus.OK);
     } catch (error) {
