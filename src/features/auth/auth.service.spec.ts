@@ -8,20 +8,20 @@ import { JwtService } from '@nestjs/jwt';
 describe('AuthService', () => {
   let service: AuthService;
 
-  const TestUser = {
-    id: 1,
-    firstName: 'Test',
-    lastName: 'Test',
-    email: 'testingemail@mail.com',
-    password: 'Testingpassword123!',
-    photo: '/files/users/default/default_photo.png',
-    isAdmin: false,
-  };
+  // const TestUser = {
+  //   id: 1,
+  //   firstName: 'Test',
+  //   lastName: 'Test',
+  //   email: 'testingemail@mail.com',
+  //   password: 'Testingpassword123!',
+  //   photo: '/files/users/default/default_photo.png',
+  //   isAdmin: false,
+  // };
 
-  const tokens = {
-    accessToken: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmb29',
-    refreshToken: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmb29',
-  };
+  // const tokens = {
+  //   accessToken: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmb29',
+  //   refreshToken: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmb29',
+  // };
 
   const mockSequelizeUsers = {
     findOne: jest.fn(),
