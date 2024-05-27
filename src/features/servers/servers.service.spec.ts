@@ -5,6 +5,7 @@ import { Server } from './server.model';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/user.model';
 import { ServerUser } from '../server-user/server-user.model';
+import { ChannelsServers } from '../channels-server/models/channel-server.model';
 
 let id: number;
 
@@ -57,6 +58,11 @@ describe('ServersService', () => {
     findOne: jest.fn(),
   };
 
+  const mockSequelizeChannelsServer = {
+    findOne: jest.fn(),
+    destroy: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -73,6 +79,10 @@ describe('ServersService', () => {
         {
           provide: getModelToken(ServerUser),
           useValue: mockSequelizeServerUser,
+        },
+        {
+          provide: getModelToken(ChannelsServers),
+          useValue: mockSequelizeChannelsServer,
         },
       ],
     }).compile();

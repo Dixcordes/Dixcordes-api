@@ -7,6 +7,8 @@ import { ServerUser } from 'src/features/server-user/server-user.model';
 import { UsersService } from '../users/users.service';
 import * as fs from 'fs';
 import { ServerAccessDto } from './dto/server-access.dto';
+import { ServerDeleteDto } from './dto/server-delete.dto';
+import { ChannelsServers } from '../channels-server/models/channel-server.model';
 
 @Injectable()
 export class ServersService {
@@ -18,6 +20,8 @@ export class ServersService {
     @InjectModel(ServerUser)
     private serverUserModel: typeof ServerUser,
     private usersService: UsersService,
+    @InjectModel(ChannelsServers)
+    private channelsServerModel: typeof ChannelsServers,
   ) {}
 
   async findAll(): Promise<Server[]> {
@@ -234,6 +238,51 @@ export class ServersService {
 
       // Use user property to get the user associate to the member
       return user;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async deleteServer(
+    serverDeleteDto: ServerDeleteDto,
+    userId: number,
+  ): Promise<HttpException> {
+    try {
+      const server = await this.serverModel.findOne({
+        where: { id: serverDeleteDto.serverId },
+        include: [this.userModel],
+      });
+      if (!server) {
+        throw new HttpException('server not found', HttpStatus.NOT_FOUND);
+      }
+      const user = await this.userModel.findOne({
+        where: { id: userId },
+      });
+      if (!user) {
+        throw new HttpException('user not found', HttpStatus.NOT_FOUND);
+      }
+      if (user.id != server.admin)
+        throw new HttpException(
+          "You don't have the right to do that.",
+          HttpStatus.FORBIDDEN,
+        );
+      const serverName = server.name;
+      if (serverName != serverDeleteDto.serverName)
+        throw new HttpException(
+          'Server name is incorrect',
+          HttpStatus.BAD_REQUEST,
+        );
+      await this.serverModel.destroy({
+        where: { id: server.id },
+      });
+      await this.serverUserModel.destroy({
+        where: { id: server.id },
+      });
+      await this.channelsServerModel.destroy({
+        where: { id: server.id },
+      });
+      return new HttpException('Server delete successfully', HttpStatus.OK);
     } catch (error) {
       console.log(error);
       throw error;
