@@ -6,6 +6,7 @@ import { UsersService } from '../users/users.service';
 import { User } from '../users/user.model';
 import { ServerUser } from '../server-user/server-user.model';
 import { ChannelsServers } from '../channels-server/models/channel-server.model';
+import { HttpException } from '@nestjs/common';
 
 let id: number;
 
@@ -46,6 +47,7 @@ describe('ServersService', () => {
     findOne: jest.fn(),
     getAllMembers: jest.fn(() => [testUser]),
     updateServer: jest.fn(),
+    deleteServer: jest.fn(),
   };
 
   const mockSequelizeUsers = {
@@ -167,6 +169,30 @@ describe('ServersService', () => {
     //     members: undefined,
     //   }).toEqual(updatedServer);
     // });
+    it('should delete a server', async () => {
+      const destroyStub = jest.fn();
+      jest.spyOn(model, 'findOne').mockReturnValue({
+        destroy: destroyStub,
+      } as any);
+      jest
+        .spyOn(service, 'deleteServer')
+        .mockResolvedValue(
+          Promise.resolve(testServer as unknown as Promise<HttpException>),
+        );
+      jest
+        .spyOn(User, 'findOne')
+        .mockResolvedValue(
+          Promise.resolve(testUser as unknown as Promise<User>),
+        );
+      await service.deleteServer(
+        {
+          serverId: testServer.id,
+          serverName: testServer.name,
+        },
+        parseInt(userId),
+      );
+      expect(service.deleteServer).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('Server members', () => {
