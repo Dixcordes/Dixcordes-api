@@ -12,4 +12,10 @@ export class ServerDto {
   admin: number;
   totalMembers: Set<number>;
   members: Set<string>;
+
+  constructor(name: string, photo: string, isPublic: boolean) {
+    this.name = name;
+    this.photo = photo;
+    this.isPublic = isPublic;
+  }
 }
