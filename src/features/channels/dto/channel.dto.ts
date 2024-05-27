@@ -14,4 +14,16 @@ export class ChannelDto {
   @IsNotEmpty()
   @IsNumber()
   serverId: number;
+
+  constructor(
+    name: string,
+    isPrivate: boolean,
+    type: ChannelsType,
+    serverId: number,
+  ) {
+    this.name = name;
+    this.isPrivate = isPrivate;
+    this.type = type;
+    this.serverId = serverId;
+  }
 }
