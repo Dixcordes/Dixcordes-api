@@ -3,6 +3,7 @@ import { FriendsRequestService } from './friends-request.service';
 import { FriendsRequest } from './model/friend-request.model';
 import { FriendsRequestDto } from './dto/friend-request.dto';
 import { Friends } from '../friends/models/friend.model';
+import { FriendsSendRequestDto } from './dto/friend-send-request.dto';
 
 @Controller('friendsRequest')
 export class FriendsRequestController {
@@ -24,14 +25,17 @@ export class FriendsRequestController {
     );
   }
 
-  @Post('sendAddFriendRequest/:userEmailToAdd')
+  @Post('sendAddFriendRequest')
   addFriend(
-    @Param('userEmailToAdd') userEmailToAdd,
+    @Body() friendsSendRequestDto: FriendsSendRequestDto,
     @Request() req,
   ): Promise<FriendsRequest> {
+    friendsSendRequestDto = {
+      from: req.user.sub,
+      to: friendsSendRequestDto.to,
+    };
     return this.friendsRequestService.sendAddFriendRequest(
-      req.user.sub,
-      userEmailToAdd,
+      friendsSendRequestDto,
     );
   }
 

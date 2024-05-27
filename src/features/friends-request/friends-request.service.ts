@@ -5,6 +5,7 @@ import { FriendsRequest } from '../friends-request/model/friend-request.model';
 import { Friends } from '../friends/models/friend.model';
 import { FriendsRequestDto } from './dto/friend-request.dto';
 import { FriendsService } from '../friends/friends.service';
+import { FriendsSendRequestDto } from './dto/friend-send-request.dto';
 
 @Injectable()
 export class FriendsRequestService {
@@ -54,22 +55,23 @@ export class FriendsRequestService {
   }
 
   async sendAddFriendRequest(
-    userId: number,
-    userEmailToAdd: string,
+    friendsSendRequestDto: FriendsSendRequestDto,
   ): Promise<FriendsRequest> {
     try {
-      const findUser = await this.usersService.findOne(userId);
+      const findUser = await this.usersService.findOne(
+        friendsSendRequestDto.from,
+      );
       if (!findUser)
         throw new HttpException(
           'Error while sending request',
           HttpStatus.BAD_REQUEST,
         );
       const findUserToAdd = await this.usersService.findOneByEmail(
-        userEmailToAdd,
+        friendsSendRequestDto.to,
       );
       if (!findUserToAdd)
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-      if (userId === findUserToAdd.id)
+      if (friendsSendRequestDto.from === findUserToAdd.id)
         throw new HttpException(
           'You cannot add yourself as a friend...',
           HttpStatus.CONFLICT,

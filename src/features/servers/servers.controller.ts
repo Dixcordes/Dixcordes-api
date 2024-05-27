@@ -17,6 +17,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { FilesServices } from 'src/utils/files/files-utils.service';
+import { ServerAccessDto } from './dto/server-access.dto';
 
 @Controller('servers')
 export class ServersController {
@@ -41,14 +42,28 @@ export class ServersController {
     return this.serversService.createServer(serverDto, req.user.sub);
   }
 
-  @Post('join/:serverId')
-  joinServer(@Param('serverId') serverId, @Request() req): Promise<Server> {
-    return this.serversService.joinServer(serverId, req.user.sub);
+  @Post('join')
+  joinServer(
+    @Body() serverAccessDto: ServerAccessDto,
+    @Request() req,
+  ): Promise<Server> {
+    serverAccessDto = {
+      userId: req.user.sub,
+      serverId: serverAccessDto.serverId,
+    };
+    return this.serversService.joinServer(serverAccessDto);
   }
 
-  @Post('leave/:serverId')
-  leaveServer(@Param('serverId') serverId, @Request() req): Promise<Server> {
-    return this.serversService.leaveServer(serverId, req.user.sub);
+  @Post('leave')
+  leaveServer(
+    @Body() serverAccessDto: ServerAccessDto,
+    @Request() req,
+  ): Promise<Server> {
+    serverAccessDto = {
+      userId: req.user.sub,
+      serverId: serverAccessDto.serverId,
+    };
+    return this.serversService.leaveServer(serverAccessDto);
   }
 
   @Get('/:serverId')
