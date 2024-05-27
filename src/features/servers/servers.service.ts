@@ -6,6 +6,7 @@ import { User } from 'src/features/users/user.model';
 import { ServerUser } from 'src/features/server-user/server-user.model';
 import { UsersService } from '../users/users.service';
 import * as fs from 'fs';
+import { ServerAccessDto } from './dto/server-access.dto';
 
 @Injectable()
 export class ServersService {
@@ -106,13 +107,13 @@ export class ServersService {
     } as Server;
   }
 
-  async joinServer(serverId: number, req: string): Promise<Server> {
+  async joinServer(serverAccessDto: ServerAccessDto): Promise<Server> {
     try {
       const server = await this.serverModel.findOne({
-        where: { id: serverId },
+        where: { id: serverAccessDto.serverId },
       });
       const user = await this.userModel.findOne({
-        where: { id: req },
+        where: { id: serverAccessDto.userId },
       });
       if (!server) {
         throw new HttpException('server not found', HttpStatus.NOT_FOUND);
@@ -125,7 +126,7 @@ export class ServersService {
           totalMembers: server.totalMembers + 1,
         },
         {
-          where: { id: serverId },
+          where: { id: serverAccessDto.serverId },
           returning: true, // This ensures that the updated server is returned
         },
       );
@@ -142,13 +143,13 @@ export class ServersService {
     }
   }
 
-  async leaveServer(serverId: number, req: string): Promise<Server> {
+  async leaveServer(serverAccessDto: ServerAccessDto): Promise<Server> {
     try {
       const server = await this.serverModel.findOne({
-        where: { id: serverId },
+        where: { id: serverAccessDto.serverId },
       });
       const user = await this.userModel.findOne({
-        where: { id: req },
+        where: { id: serverAccessDto.userId },
       });
       if (!server) {
         throw new HttpException('server not found', HttpStatus.NOT_FOUND);
@@ -161,7 +162,7 @@ export class ServersService {
           totalMembers: server.totalMembers - 1,
         },
         {
-          where: { id: serverId },
+          where: { id: serverAccessDto.serverId },
           returning: true, // This ensures that the updated server is returned
         },
       );
