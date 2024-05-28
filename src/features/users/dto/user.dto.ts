@@ -32,4 +32,18 @@ export class UserDto {
   })
   password: string;
   isAdmin: boolean;
+
+  constructor(
+    firstName: string,
+    lastName: string,
+    photo: string,
+    email: string,
+    password: string,
+  ) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.photo = photo;
+    this.email = email;
+    this.password = password;
+  }
 }
