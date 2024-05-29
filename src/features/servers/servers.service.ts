@@ -116,13 +116,23 @@ export class ServersService {
       const server = await this.serverModel.findOne({
         where: { id: serverAccessDto.serverId },
       });
+      if (!server) {
+        throw new HttpException('server not found', HttpStatus.NOT_FOUND);
+      }
       const user = await this.userModel.findOne({
         where: { id: serverAccessDto.userId },
       });
-      if (!server) {
-        throw new HttpException('server not found', HttpStatus.NOT_FOUND);
-      } else if (!user) {
+      if (!user) {
         throw new HttpException('user not found', HttpStatus.NOT_FOUND);
+      }
+      const userAlreadyInServer = await this.serverUserModel.findOne({
+        where: { userId: user.id },
+      });
+      if (userAlreadyInServer) {
+        throw new HttpException(
+          'You are already in the server',
+          HttpStatus.FORBIDDEN,
+        );
       }
 
       const updatedServer = await this.serverModel.update(
@@ -147,18 +157,30 @@ export class ServersService {
     }
   }
 
-  async leaveServer(serverAccessDto: ServerAccessDto): Promise<Server> {
+  async leaveServer(serverAccessDto: ServerAccessDto): Promise<HttpException> {
     try {
       const server = await this.serverModel.findOne({
         where: { id: serverAccessDto.serverId },
       });
+      if (!server) {
+        throw new HttpException('server not found', HttpStatus.NOT_FOUND);
+      }
       const user = await this.userModel.findOne({
         where: { id: serverAccessDto.userId },
       });
-      if (!server) {
-        throw new HttpException('server not found', HttpStatus.NOT_FOUND);
-      } else if (!user) {
+      if (!user) {
         throw new HttpException('user not found', HttpStatus.NOT_FOUND);
+      }
+
+      const userNotInTheServer = await this.serverUserModel.findOne({
+        where: { userId: user.id },
+      });
+
+      if (!userNotInTheServer) {
+        throw new HttpException(
+          'Error when leaving the server.',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       const updatedServer = await this.serverModel.update(
@@ -174,7 +196,10 @@ export class ServersService {
       const updatedServerData = updatedServer[1][0];
 
       await updatedServerData.$remove('members', user);
-      return server;
+      return new HttpException(
+        'Successfully live the server.',
+        HttpStatus.ACCEPTED,
+      );
     } catch (error) {
       console.log(error);
       throw error;

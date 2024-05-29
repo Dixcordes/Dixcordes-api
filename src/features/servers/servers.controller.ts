@@ -61,7 +61,7 @@ export class ServersController {
   leaveServer(
     @Body() serverAccessDto: ServerAccessDto,
     @Request() req,
-  ): Promise<Server> {
+  ): Promise<HttpException> {
     serverAccessDto = {
       userId: req.user.sub,
       serverId: serverAccessDto.serverId,
