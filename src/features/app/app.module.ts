@@ -10,7 +10,6 @@ import { ServersModule } from '../servers/servers.module';
 import { AuthGuard } from '../auth/auth.guard';
 import { ServerUser } from '../server-user/server-user.model';
 import { Server } from '../servers/server.model';
-import * as config from '../../../config/config.json';
 import { FriendsModule } from '../friends/friends.module';
 import { Friends } from '../friends/models/friend.model';
 import { FriendsRequest } from '../friends-request/model/friend-request.model';
@@ -20,8 +19,8 @@ import { ChannelsModule } from '../channels/channel.module';
 import { Channels } from '../channels/models/channel.model';
 import { ChannelsServers } from '../channels-server/models/channel-server.model';
 import { ChannelsGatewayModule } from '../channels-websocket/channels-gateway.module';
+import { Dialect } from 'sequelize';
 
-const DbDevConfig = config.development;
 @Module({
   imports: [
     DevtoolsModule.register({
@@ -29,8 +28,12 @@ const DbDevConfig = config.development;
       port: parseInt(process.env.API_HTTP_DEVTOOLS_PORT),
     }),
     SequelizeModule.forRoot({
-      ...DbDevConfig,
-      dialect: 'postgres',
+      dialect: process.env.DB_DIALECT as Dialect,
+      host: process.env.DB_HOST,
+      database: process.env.DB_NAME,
+      port: parseInt(process.env.DB_PORT),
+      username: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
       models: [
         User,
         Server,

@@ -43,4 +43,4 @@ services:
     networks:
       - backend
     volumes:
-      - redis-data:/data
+      - ./database/redis-data:/data
