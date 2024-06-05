@@ -1,7 +1,8 @@
-version: '3'
-name: 10cordes
+name: dixcordes
 volumes:
   postgres-data:
+  cassandra-data:
+  redis-data:
 networks:
   backend:
 
@@ -20,3 +21,26 @@ services:
       - backend
     volumes:
       - ./database/pgdatacordes:/var/lib/postgresql/data
+  cassandra:
+    image: 'cassandra:4.1.5'
+    container_name: cordes-cassandra
+    restart: always
+    environment:
+      - CASSANDRA_USER=cordes
+      - CASSANDRA_PASSWORD=cordes
+    ports:
+      - 9042:9042
+    networks:
+      - backend
+    volumes:
+      - ./database/cassandradata:/var/lib/cassandra
+  redis:
+    image: 'redis:7.2.5-alpine'
+    container_name: cordes-redis
+    restart: always
+    ports:
+      - 6379:6379
+    networks:
+      - backend
+    volumes:
+      - redis-data:/data
