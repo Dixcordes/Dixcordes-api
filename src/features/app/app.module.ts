@@ -50,7 +50,14 @@ import { CassandraModule } from '@mich4l/nestjs-cassandra';
     CassandraModule.forRoot({
       keyspace: process.env.DB_KEYSPACE,
       contactPoints: [process.env.DB_CONTACT_POINT],
-      localDataCenter: 'datacenter1',
+      protocolOptions: {
+        port: parseInt(process.env.DB_CASSANDRA_PORT),
+      },
+      localDataCenter: process.env.DB_CASSANDRA_LOCAL_DATA_CENTER,
+      credentials: {
+        username: process.env.DB_CASSANDRA_USER,
+        password: process.env.DB_CASSANDRA_PASSWORD,
+      },
     }),
     UsersModule,
     AuthModule,
