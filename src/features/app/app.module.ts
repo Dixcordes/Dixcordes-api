@@ -20,6 +20,7 @@ import { Channels } from '../channels/models/channel.model';
 import { ChannelsServers } from '../channels-server/models/channel-server.model';
 import { ChannelsGatewayModule } from '../channels-websocket/channels-gateway.module';
 import { Dialect } from 'sequelize';
+import { CassandraModule } from '@mich4l/nestjs-cassandra';
 
 @Module({
   imports: [
@@ -45,6 +46,11 @@ import { Dialect } from 'sequelize';
       ],
       autoLoadModels: true,
       synchronize: true,
+    }),
+    CassandraModule.forRoot({
+      keyspace: process.env.DB_KEYSPACE,
+      contactPoints: [process.env.DB_CONTACT_POINT],
+      localDataCenter: 'datacenter1',
     }),
     UsersModule,
     AuthModule,
