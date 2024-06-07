@@ -22,6 +22,8 @@ async function bootstrap() {
   // Enable CORS if needed
   app.enableCors();
 
+  app.enableShutdownHooks();
+
   await app.listen(process.env.API_PORT);
 }
 bootstrap();
