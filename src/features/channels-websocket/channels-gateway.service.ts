@@ -10,6 +10,33 @@ export class ChannelsGatewayServices {
     private readonly dbClient: Client,
   ) {}
 
+  async getLastId() {
+    try {
+      const query = 'SELECT * FROM channel_messages';
+      const result = await this.dbClient.execute(query, {
+        consistency: 1,
+      });
+      let channelId = 0;
+      const channelIdArrayIteration: number[] = [];
+      if (result.rows.length === 0) {
+        return 0;
+      }
+      for (let i = 0; i < result.rowLength; i++) {
+        channelId = result.rows[i].cha_id;
+        channelIdArrayIteration.push(channelId);
+      }
+      const channelIdArrayIterationShorted = channelIdArrayIteration
+        .slice()
+        .sort((a, b) => a - b);
+      return channelIdArrayIterationShorted[
+        channelIdArrayIterationShorted.length - 1
+      ];
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
   async saveMessage(messageInChannelDto: MessageInChannelDto) {
     try {
       if (!messageInChannelDto.author) {
@@ -21,13 +48,16 @@ export class ChannelsGatewayServices {
       if (!messageInChannelDto.message) {
         throw new Error('Message is missing');
       }
-      const query = `INSERT INTO dixcordes.channel_messages (cha_id, author, channel, message) VALUES (8, '${messageInChannelDto.author}', '${messageInChannelDto.message}', '${messageInChannelDto.channelName}');`;
+      this.getLastId();
+      const lastId = await this.getLastId();
+      const query = `INSERT INTO dixcordes.channel_messages (cha_id, author, channel, message) VALUES (${
+        lastId + 1
+      }, '${messageInChannelDto.author}', '${messageInChannelDto.message}', '${
+        messageInChannelDto.channelName
+      }');`;
       const result = await this.dbClient.execute(query, {
         consistency: 1,
       });
-
-      console.log(result.rows);
-
       return result.rows;
     } catch (error) {
       console.log(error);
