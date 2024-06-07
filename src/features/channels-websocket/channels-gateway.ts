@@ -17,6 +17,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import { UserUtilsWs } from '../../utils/ws/user-utils-ws';
 import { MessageInChannelDto } from './dto/message-channel.dto';
 import { ServersService } from '../servers/servers.service';
+import { ChannelsGatewayServices } from './channels-gateway.service';
 
 @WebSocketGateway({
   namespace: 'channel',
@@ -36,6 +37,7 @@ export class ChannelsGateway
     private channelsService: ChannelsService,
     private userUtilsWs: UserUtilsWs,
     private serverService: ServersService,
+    private channelsGatewayServices: ChannelsGatewayServices,
   ) {}
 
   afterInit(server: Server) {
@@ -147,6 +149,11 @@ export class ChannelsGateway
           messageInChannelDto.channelName,
           `${author}: ${messageInChannelDto.message}`,
         );
+      this.channelsGatewayServices.saveMessage({
+        author: user.firstName,
+        message: messageInChannelDto.message,
+        channelName: messageInChannelDto.channelName,
+      });
     } catch (error) {
       console.log(error);
       throw new WsException(error);

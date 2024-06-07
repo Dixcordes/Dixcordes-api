@@ -7,11 +7,13 @@ import { ServersService } from 'src/features/servers/servers.service';
 import { ChannelsModule } from '../channels/channel.module';
 import { ChannelsService } from '../channels/channel.service';
 import { UserUtilsWs } from '../../utils/ws/user-utils-ws';
+import { ChannelsGatewayServices } from './channels-gateway.service';
 
 @Module({
   imports: [UsersModule, ServersModule, ChannelsModule],
   providers: [
     ChannelsGateway,
+    ChannelsGatewayServices,
     UsersService,
     ServersService,
     ChannelsService,
