@@ -21,12 +21,14 @@ export class ChannelsGatewayServices {
       if (!messageInChannelDto.message) {
         throw new Error('Message is missing');
       }
-      // const query = `INSERT INTO dixcordes.channel_messages (cha_id, author, channel, message) VALUES (1, '${messageInChannelDto.author}', '${messageInChannelDto.message}', '${messageInChannelDto.channelName}') IF NOT EXISTS;`;
-      const result = await this.dbClient.execute(query);
+      const query = `INSERT INTO dixcordes.channel_messages (cha_id, author, channel, message) VALUES (8, '${messageInChannelDto.author}', '${messageInChannelDto.message}', '${messageInChannelDto.channelName}');`;
+      const result = await this.dbClient.execute(query, {
+        consistency: 1,
+      });
 
-      console.log(result);
+      console.log(result.rows);
 
-      return result.rows[0];
+      return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
