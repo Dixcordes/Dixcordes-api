@@ -1,11 +1,11 @@
 export class MessageInChannelDto {
   channelName: string;
-  message: string;
+  content: string;
   author: string;
 
-  constructor(channelName: string, message: string, author: string) {
+  constructor(channelName: string, content: string, author: string) {
     this.channelName = channelName;
-    this.message = message;
+    this.content = content;
     this.author = author;
   }
 }
