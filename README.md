@@ -73,6 +73,14 @@ DEV_URL=
 
 JWT_SECRET=
 ```
+
+Creating the Cassandra Keyspace and Table
+
+```bash
+CREATE KEYSPACE IF NOT EXISTS dixcordes WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+
+CREATE TABLE IF NOT EXISTS dixcordes.channel_messages (id uuid, author text, channel text, content text, PRIMARY KEY((id, author)));
+```
 ## Support
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).

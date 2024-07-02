@@ -147,11 +147,11 @@ export class ChannelsGateway
         .to(messageInChannelDto.channelName)
         .emit(
           messageInChannelDto.channelName,
-          `${author}: ${messageInChannelDto.message}`,
+          `${author}: ${messageInChannelDto.content}`,
         );
       this.channelsGatewayServices.saveMessage({
         author: user.firstName,
-        message: messageInChannelDto.message,
+        content: messageInChannelDto.content,
         channelName: messageInChannelDto.channelName,
       });
     } catch (error) {
